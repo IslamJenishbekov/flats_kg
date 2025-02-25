@@ -1,0 +1,32 @@
+<!-- templates/users/profile.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h2>Профиль пользователя</h2>
+
+  <div>
+    <h4>Имя пользователя:</h4>
+    <p>{{ user.username }}</p>
+  </div>
+
+  <div>
+    <h4>Роль:</h4>
+    <p>{{ user.role }}</p>
+  </div>
+
+  <div>
+    <h4>Ссылка на Telegram:</h4>
+    <p>{{ user.tg_link }}</p>
+  </div>
+
+  <div>
+    <h4>Номер телефона:</h4>
+    <p>{{ user.tel_number }}</p>
+  </div>
+
+  <div>
+    <h4>Дата регистрации:</h4>
+    <p>{{ user.created_at }}</p>
+  </div>
+
+{% endblock %}

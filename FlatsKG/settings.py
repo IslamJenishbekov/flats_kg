@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -109,6 +111,15 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Используйте базу данных для хранения сессий
+SESSION_COOKIE_SECURE = False  # Для разработки, в продакшене должно быть True
+SESSION_COOKIE_HTTPONLY = True  # Защита от XSS
+SESSION_COOKIE_AGE = 86400  # Устанавливаем время жизни cookies на 1 день
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Сессия не должна заканчиваться при закрытии браузера
+
+# Если хотите, чтобы cookies имели определенный срок, установите SESSION_COOKIE_AGE в нужное количество секунд.
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -130,3 +141,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+LOGIN_REDIRECT_URL = reverse_lazy('all_listings')
+
+AUTH_USER_MODEL = 'users.User'

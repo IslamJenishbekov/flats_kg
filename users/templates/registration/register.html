@@ -1,0 +1,42 @@
+<!-- templates/register.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <h2>Регистрация нового пользователя</h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <div>
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+        </div>
+
+        <div>
+            <label for="tg_link">Ссылка на Telegram:</label>
+            <input type="text" id="tg_link" name="tg_link" placeholder="Введите ссылку на Telegram" required>
+        </div>
+
+        <div>
+            <label for="tel_number">Номер телефона:</label>
+            <input type="text" id="tel_number" name="tel_number" placeholder="Введите номер телефона" required>
+        </div>
+
+        <div>
+            <label for="password1">Пароль:</label>
+            <input type="password" id="password1" name="password1" placeholder="Введите пароль" required>
+        </div>
+
+        <div>
+            <label for="password2">Подтвердите пароль:</label>
+            <input type="password" id="password2" name="password2" placeholder="Подтвердите пароль" required>
+        </div>
+
+        {{ form.errors }}
+
+        <div>
+            <button type="submit">Зарегистрироваться</button>
+        </div>
+    </form>
+
+    <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a></p>
+{% endblock %}

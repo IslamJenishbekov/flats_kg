@@ -26,4 +26,5 @@ urlpatterns = [
     path('listings/', include('listings.urls')),
     path('common/', include('common.urls')),
     path('', lambda request: redirect('listings/all', permanent=True)),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
