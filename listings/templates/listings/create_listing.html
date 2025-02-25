@@ -1,0 +1,121 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <h2>Создать публикацию</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div>
+            <label for="listing_type">Тип объявления:</label>
+            <select name="listing_type" required>
+                <option value="" disabled selected>Выберите тип объявления</option>
+                {% for value in listing_types %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="apartment_series">Серия квартиры:</label>
+            <select name="apartment_series" required>
+                <option value="" disabled selected>Выберите серию</option>
+                {% for value in apartment_series %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="heating">Отопление:</label>
+            <select name="heating" required>
+                <option value="" disabled selected>Выберите тип отопления</option>
+                {% for value in heating_options %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="condition">Состояние:</label>
+            <select name="condition" required>
+                <option value="" disabled selected>Выберите состояние</option>
+                {% for value in conditions %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="furniture">Мебель:</label>
+            <select name="furniture" required>
+                <option value="" disabled selected>Выберите мебель</option>
+                {% for value in furniture_options %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="rooms">Количество комнат:</label>
+            <select name="rooms" required>
+                <option value="" disabled selected>Выберите количество комнат</option>
+                {% for value in room_options %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="area">Площадь:</label>
+            <input type="number" step="0.1" name="area" required>
+        </div>
+
+        <div>
+            <label for="floor">Этаж:</label>
+            <input type="number" name="floor" required>
+        </div>
+
+        <div>
+            <label for="total_floors">Всего этажей:</label>
+            <input type="number" name="total_floors" required>
+        </div>
+
+        <div>
+            <label for="year_built">Год постройки:</label>
+            <input type="number" name="year_built" required>
+        </div>
+
+        <div>
+            <label for="wall_material">Тип дома:</label>
+            <select name="wall_material" required>
+                <option value="" disabled selected>Выберите тип дома</option>
+                {% for value in wall_material_options %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="developer">Застройщик:</label>
+            <select name="developer" required>
+                <option value="" disabled selected>Выберите застройщика</option>
+                {% for value in developers %}
+                    <option value="{{ value }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="description">Описание:</label>
+            <textarea name="description" required></textarea>
+        </div>
+
+        <div>
+            <label for="pictures">Фотографии:</label>
+            <input type="file" name="pictures" multiple accept=".png, .jpg, .jpeg">
+        </div>
+
+
+        <button type="submit">Создать публикацию</button>
+    </form>
+{% endblock %}
