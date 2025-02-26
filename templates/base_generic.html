@@ -8,40 +8,54 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <div class="container">
-        <!-- Навигация -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="/">Мой сайт</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ml-auto">
+<div class="container">
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Мой сайт</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                {% if not user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href='{% url 'login' %}'>Вход</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href='{% url 'users:register' %}'>Регистрация</a>
                     </li>
+                {% else %}
                     <!-- Личный кабинет (появляется только после входа пользователя) -->
                     <li class="nav-item">
-                        <a class="nav-link" href='{% url 'users:profile' %}'>Личный кабинет</a>
+                        <a class="nav-link" href="{% url 'users:profile' %}">Личный кабинет</a>
                     </li>
-                </ul>
-            </div>
-        </nav>
+                    <li class="nav-item">
+                        <form action="{% url 'users:logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link btn btn-link"
+                                    style="border: none; background: none; cursor: pointer;">
+                                Выйти
+                            </button>
+                        </form>
+                    </li>
 
-        <!-- Контент страницы -->
-        <div class="my-4">
-            {% block content %}{% endblock %}
+
+                {% endif %}
+            </ul>
         </div>
+    </nav>
 
-        <!-- Футер -->
-        <footer class="text-center py-4">
-            <p>&copy; 2025 Мой сайт</p>
-        </footer>
+    <!-- Контент страницы -->
+    <div class="my-4">
+        {% block content %}{% endblock %}
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    {% block extra_js %}{% endblock %}
+    <!-- Футер -->
+    <footer class="text-center py-4">
+        <p>&copy; 2025 Мой сайт</p>
+    </footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>
