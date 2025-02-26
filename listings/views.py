@@ -50,7 +50,7 @@ def create_listing(request):
         for image in request.FILES.getlist("pictures"):
             ListingPicture.objects.create(listing=listing, image=image)
 
-        return redirect("users/profile", listing.id)
+        return redirect("users:profile")
 
     with open(r'listings/possible_fields.json', 'r') as file:
         context = json.load(file)
