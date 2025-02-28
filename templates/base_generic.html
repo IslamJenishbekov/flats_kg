@@ -9,7 +9,7 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <nav class="bg-gray-800 p-4 shadow-md">
+<nav class="bg-gray-800 p-4 shadow-md">
     <div class="container mx-auto flex justify-between items-center">
         <a href="/" class="text-white text-2xl font-bold">Мой сайт</a>
         <div class="space-x-4">
@@ -17,7 +17,7 @@
                 <a href="{% url 'login' %}" class="text-white">Вход</a>
                 <a href="{% url 'users:register' %}" class="text-white">Регистрация</a>
             {% else %}
-                <span class="text-white">Привет, {{ user.username }}!</span>
+                <a href="{% url 'users:profile' %}" class="text-white hover:text-gray-300">Привет, {{ user.username }}!</a>
                 <form action="{% url 'users:logout' %}" method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit" class="text-white bg-transparent border-0">Выйти</button>
@@ -27,14 +27,14 @@
     </div>
 </nav>
 
-    <main class="flex-grow flex items-center justify-center bg-gray-50">
-        {% block content %}{% endblock %}
-    </main>
+<main class="flex-grow flex items-center justify-center bg-gray-50">
+    {% block content %}{% endblock %}
+</main>
 
-    <footer class="bg-gray-800 text-white text-center py-4">
-        <p>&copy; 2025 Мой сайт</p>
-    </footer>
+<footer class="bg-gray-800 text-white text-center py-4">
+    <p>&copy; 2025 Мой сайт</p>
+</footer>
 
-    {% block extra_js %}{% endblock %}
+{% block extra_js %}{% endblock %}
 </body>
 </html>
