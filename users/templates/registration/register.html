@@ -1,42 +1,57 @@
-<!-- templates/register.html -->
 {% extends 'base_generic.html' %}
 
 {% block content %}
-    <h2>Регистрация нового пользователя</h2>
-    <form method="POST">
+
+  <div class="flex flex-col flex-grow justify-center bg-gray-50 py-8">
+
+    <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
+      <h2 class="text-2xl font-semibold text-center mb-6">Регистрация нового пользователя</h2>
+
+      <form method="POST">
         {% csrf_token %}
 
-        <div>
-            <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+        <div class="mb-4">
+          <label for="username" class="block text-sm font-medium text-gray-700">Имя пользователя:</label>
+          <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+        </div>
+
+        <div class="mb-4">
+          <label for="tg_link" class="block text-sm font-medium text-gray-700">Ссылка на Telegram:</label>
+          <input type="text" id="tg_link" name="tg_link" placeholder="Введите ссылку на Telegram" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+        </div>
+
+        <div class="mb-4">
+          <label for="tel_number" class="block text-sm font-medium text-gray-700">Номер телефона:</label>
+          <input type="text" id="tel_number" name="tel_number" placeholder="Введите номер телефона" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+        </div>
+
+        <div class="mb-4">
+          <label for="password1" class="block text-sm font-medium text-gray-700">Пароль:</label>
+          <input type="password" id="password1" name="password1" placeholder="Введите пароль" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+        </div>
+
+        <div class="mb-6">
+          <label for="password2" class="block text-sm font-medium text-gray-700">Подтвердите пароль:</label>
+          <input type="password" id="password2" name="password2" placeholder="Подтвердите пароль" required
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+        </div>
+
+        <div class="text-red-500 text-sm mb-4">
+          {{ form.errors }}
         </div>
 
         <div>
-            <label for="tg_link">Ссылка на Telegram:</label>
-            <input type="text" id="tg_link" name="tg_link" placeholder="Введите ссылку на Telegram" required>
+          <button type="submit" class="w-full py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+            Зарегистрироваться
+          </button>
         </div>
+      </form>
 
-        <div>
-            <label for="tel_number">Номер телефона:</label>
-            <input type="text" id="tel_number" name="tel_number" placeholder="Введите номер телефона" required>
-        </div>
-
-        <div>
-            <label for="password1">Пароль:</label>
-            <input type="password" id="password1" name="password1" placeholder="Введите пароль" required>
-        </div>
-
-        <div>
-            <label for="password2">Подтвердите пароль:</label>
-            <input type="password" id="password2" name="password2" placeholder="Подтвердите пароль" required>
-        </div>
-
-        {{ form.errors }}
-
-        <div>
-            <button type="submit">Зарегистрироваться</button>
-        </div>
-    </form>
-
-    <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a></p>
+      <p class="mt-4 text-center text-sm text-gray-600">Уже есть аккаунт? <a href="{% url 'login' %}" class="text-yellow-400 hover:text-yellow-500">Войдите</a></p>
+    </div>
+  </div>
 {% endblock %}

@@ -1,25 +1,35 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-  <h2>Вход в систему</h2>
+  <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-center mb-6">Вход в систему</h2>
 
-  <form method="post">
-    {% csrf_token %}
+    <form method="post">
+      {% csrf_token %}
 
-    <div>
-      <label for="username">Имя пользователя:</label>
-      <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
-    </div>
+      <div class="mb-4">
+        <label for="username" class="block text-sm font-medium text-gray-700">Имя пользователя:</label>
+        <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+      </div>
 
-    <div>
-      <label for="password">Пароль:</label>
-      <input type="password" id="password" name="password" placeholder="Введите пароль" required>
-    </div>
-    {{ form.errors }}
-    <div>
-      <button type="submit">Войти</button>
-    </div>
-  </form>
+      <div class="mb-6">
+        <label for="password" class="block text-sm font-medium text-gray-700">Пароль:</label>
+        <input type="password" id="password" name="password" placeholder="Введите пароль" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+      </div>
 
-  <p>Нет аккаунта? <a href="{% url 'users:profile' %}">Зарегистрируйтесь</a></p>
+      <div class="text-red-500 text-sm mb-4">
+        {{ form.errors }}
+      </div>
+
+      <div>
+        <button type="submit" class="w-full py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+          Войти
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-4 text-center text-sm text-gray-600">Нет аккаунта? <a href="{% url 'users:register' %}" class="text-yellow-400 hover:text-yellow-500">Зарегистрируйтесь</a></p>
+  </div>
 {% endblock %}
