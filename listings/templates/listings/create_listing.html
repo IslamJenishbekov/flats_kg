@@ -5,9 +5,8 @@
         <div class="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
             <h2 class="text-2xl font-semibold text-center mb-6">Создать публикацию</h2>
 
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6" id="create-listing-form">
                 {% csrf_token %}
-
                 <div>
                     <label for="listing_type" class="block text-sm font-medium text-gray-700">Тип объявления:</label>
                     <select name="listing_type" required
@@ -131,9 +130,10 @@
                     <label for="pictures" class="block text-sm font-medium text-gray-700">Фотографии:</label>
                     <div class="mt-1 relative">
                         <input type="file" name="pictures" multiple accept=".png, .jpg, .jpeg" id="pictures"
-                               class="opacity-0 absolute inset-0 w-full h-full cursor-pointer">
+                               class="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                               onchange="updateFileList()">
                         <div class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 flex items-center justify-between">
-                            <span>Выберите файлы</span>
+                            <span id="file-list">Выберите файлы</span>
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -141,6 +141,7 @@
                             </svg>
                         </div>
                     </div>
+                    <div id="selected-files" class="mt-2 flex flex-wrap gap-2"></div>
                 </div>
 
                 <div>
@@ -152,4 +153,54 @@
             </form>
         </div>
     </div>
+
+    <script>
+        function updateFileList() {
+            const input = document.getElementById('pictures');
+            const fileList = document.getElementById('file-list');
+            const selectedFiles = document.getElementById('selected-files');
+            const files = input.files;
+
+            if (files.length > 0) {
+                fileList.textContent = `Выбрано файлов: ${files.length}`;
+                selectedFiles.innerHTML = '';
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'relative w-24 h-24 rounded-lg overflow-hidden shadow-md';
+
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.alt = file.name;
+                    img.className = 'w-full h-full object-cover';
+
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = '×';
+                    removeButton.className = 'absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600';
+                    removeButton.onclick = () => removeFile(i);
+                    fileItem.appendChild(removeButton);
+
+                    fileItem.appendChild(img);
+                    selectedFiles.appendChild(fileItem);
+                }
+            } else {
+                fileList.textContent = 'Выберите файлы';
+                selectedFiles.innerHTML = '';
+            }
+        }
+
+        function removeFile(index) {
+            const input = document.getElementById('pictures');
+            const files = Array.from(input.files);
+            files.splice(index, 1);
+
+            const dataTransfer = new DataTransfer();
+            files.forEach(file => dataTransfer.items.add(file));
+
+            input.files = dataTransfer.files;
+
+            updateFileList();
+        }
+    </script>
 {% endblock %}
