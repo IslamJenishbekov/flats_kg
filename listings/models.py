@@ -5,7 +5,9 @@ import os
 
 class Listing(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Связь с кастомным пользователем
-    num_likes = models.IntegerField(default=0)
+    rooms = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    address = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -19,7 +21,6 @@ class ListingDetail(models.Model):  # Переименовали PublishDetail �
     heating = models.CharField(max_length=50)
     condition = models.CharField(max_length=50)
     furniture = models.CharField(max_length=50)
-    rooms = models.IntegerField()
     area = models.DecimalField(max_digits=5, decimal_places=2)
     floor = models.IntegerField()
     total_floors = models.IntegerField()
@@ -27,6 +28,9 @@ class ListingDetail(models.Model):  # Переименовали PublishDetail �
     wall_material = models.CharField(max_length=50)
     developer = models.CharField(max_length=50)
     description = models.TextField()
+    num_likes = models.IntegerField(default=0)
+    region = models.CharField()
+    city = models.CharField()
 
     def __str__(self):
         return f"Details for Listing {self.listing.id}"
@@ -45,12 +49,8 @@ class ListingComment(models.Model):  # Переименовали PublishComment
 
 
 class ListingPicture(models.Model):
-    def listing_image_path(instance, filename):
-        """Создает путь вида listings/media/listing_1/photo.jpg"""
-        return os.path.join("listings/media/", f"listing_{instance.listing.id}", filename)
-
     listing = models.ForeignKey("Listing", on_delete=models.CASCADE, related_name="pictures")
-    image = models.ImageField(upload_to=listing_image_path)
+    image_base64 = models.TextField()  # Сохраняем Base64 строку изображения
 
     def __str__(self):
         return f"Picture for Listing {self.listing.id}"

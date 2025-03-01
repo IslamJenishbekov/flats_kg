@@ -74,7 +74,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'flats_kg',
         'USER': 'postgres',
-        'PASSWORD': 'qwerty',
+        'PASSWORD': 'is77',
         'HOST': 'localhost',
         'PORT': '5432',
     }

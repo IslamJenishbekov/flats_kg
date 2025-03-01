@@ -110,6 +110,36 @@
                 </div>
 
                 <div>
+                    <label for="region" class="block text-sm font-medium text-gray-700">Область:</label>
+                    <select name="region" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled selected>Выберите область</option>
+                        {% for value in region_options %}
+                            <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700">Город или село:</label>
+                    <select name="city" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled selected>Выберите город</option>
+                        {% for value in city_options %}
+                            <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Введите точный адрес:</label>
+                    <input type="text" name="address" id="address" required
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none
+                  focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                           placeholder="Введите адрес">
+                </div>
+
+                <div>
                     <label for="developer" class="block text-sm font-medium text-gray-700">Застройщик:</label>
                     <select name="developer" required
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
@@ -143,6 +173,13 @@
                     </div>
                     <div id="selected-files" class="mt-2 flex flex-wrap gap-2"></div>
                 </div>
+
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Цена ($):</label>
+                    <input type="number" name="price" required min="0" step="0.01"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                </div>
+
 
                 <div>
                     <button type="submit"
