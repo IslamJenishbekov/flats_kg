@@ -1,1 +1,34 @@
 {% extends 'base_generic.html' %}
+
+{% block content %}
+    <h1>Объявление №{{ listing.id }}</h1>
+    <p>
+        <strong>Пользователь:</strong>
+        <a href="{% url 'users:another_profile' user_id=listing.user.id %}" class="text-blue-600 hover:underline">
+            {{ listing.user.username }}
+        </a>
+    </p>
+    <p><strong>Адрес:</strong> {{ listing.address }}</p>
+    <p><strong>Цена:</strong> {{ listing.price }} USD</p>
+    <p><strong>Комнат:</strong> {{ listing.rooms }}</p>
+    <p><strong>Площадь:</strong> {{ listing_details.area }} м²</p>
+    <p><strong>Этаж:</strong> {{ listing_details.floor }} из {{ listing_details.total_floors }}</p>
+    <p><strong>Год постройки:</strong> {{ listing_details.year_built }}</p>
+    <p><strong>Материал стен:</strong> {{ listing_details.wall_material }}</p>
+    <p><strong>Разработчик:</strong> {{ listing_details.developer }}</p>
+    <p><strong>Описание:</strong> {{ listing_details.description }}</p>
+
+    <h2>Фотографии</h2>
+    {% for picture in pictures %}
+        <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления" width="300">
+    {% empty %}
+        <p>Нет фотографий</p>
+    {% endfor %}
+
+    <h2>Комментарии</h2>
+    {% for comment in comments %}
+        <p><strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
+    {% empty %}
+        <p>Комментариев пока нет</p>
+    {% endfor %}
+{% endblock %}

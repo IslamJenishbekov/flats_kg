@@ -1,1 +1,87 @@
 {% extends 'base_generic.html' %}
+
+{% block content %}
+    <h1 style="text-align: center; margin-bottom: 20px;">Объявления</h1>
+
+    <style>
+        /* Контейнер всех объявлений */
+        .listings-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Карточка объявления */
+        .listing {
+            width: 320px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .listing:hover {
+            transform: scale(1.03);
+        }
+
+        /* Заголовок объявления */
+        .listing h2 {
+            text-align: center;
+            font-size: 18px;
+            margin: 15px 10px;
+            color: #333;
+        }
+
+        /* Блок изображения */
+        .picture {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        /* Стили для изображения */
+        .picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0; /* Отключаем скругление углов */
+        }
+
+        /* Текст "Нет изображения" */
+        .picture p {
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+
+    <div class="listings-container">
+        {% for listing_info in listings_with_pictures %}
+            <a href="{% url 'listing_detail' listing_info.listing.id %}" style="text-decoration: none; color: inherit;">
+                <div class="listing">
+                    <div class="picture">
+                        {% if listing_info.picture %}
+                            {% if listing_info.picture.image_base64 %}
+                                <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}"
+                                     alt="Listing Picture">
+                            {% else %}
+                                <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture">
+                            {% endif %}
+                        {% else %}
+                            <p>Нет изображения</p>
+                        {% endif %}
+                    </div>
+                    <h2>{{ listing_info.listing.price }}$ {{ listing_info.listing.rooms }}-комнатная квартира</h2>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+

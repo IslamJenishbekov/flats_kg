@@ -1,5 +1,5 @@
 import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
 from listings.models import *
 import base64
@@ -7,7 +7,15 @@ from io import BytesIO
 
 
 def show_all_listings(request):
-    return render(request, 'listings/all_listings.html')
+    listings = Listing.objects.all()
+    listings_with_pictures = [
+        {
+            'listing': listing,
+            'picture': ListingPicture.objects.filter(listing=listing).first()
+        }
+        for listing in listings
+    ]
+    return render(request, 'listings/all_listings.html', {'listings_with_pictures': listings_with_pictures})
 
 
 def create_listing(request):
@@ -82,6 +90,16 @@ def show_my_listings(request):
 
 
 def show_listing_detail(request, listing_id):
-    listing = Listing.objects.get(id=listing_id)
-    print(listing)
-    return render(request, 'listings/listing_detail.html')
+    listing = get_object_or_404(Listing, id=listing_id)
+    listing_details = listing.details  # Получаем связанные детали объявления
+    comments = listing.comments.all().order_by('-created_at')  # Все комментарии, сортированные по дате
+    pictures = listing.pictures.all()  # Все изображения объявления
+
+    context = {
+        'listing': listing,
+        'listing_details': listing_details,
+        'comments': comments,
+        'pictures': pictures,
+    }
+
+    return render(request, 'listings/listing_detail.html', context)

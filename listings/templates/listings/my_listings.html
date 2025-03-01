@@ -63,20 +63,23 @@
 
     <div class="listings-container">
         {% for listing_info in listings_with_pictures %}
-            <div class="listing">
-                <div class="picture">
-                    {% if listing_info.picture %}
-                        {% if listing_info.picture.image_base64 %}
-                            <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}" alt="Listing Picture">
+            <a href="{% url 'listing_detail' listing_info.listing.id %}" style="text-decoration: none; color: inherit;">
+                <div class="listing">
+                    <div class="picture">
+                        {% if listing_info.picture %}
+                            {% if listing_info.picture.image_base64 %}
+                                <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}"
+                                     alt="Listing Picture">
+                            {% else %}
+                                <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture">
+                            {% endif %}
                         {% else %}
-                            <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture">
+                            <p>Нет изображения</p>
                         {% endif %}
-                    {% else %}
-                        <p>Нет изображения</p>
-                    {% endif %}
+                    </div>
+                    <h2>{{ listing_info.listing.price }}$ {{ listing_info.listing.rooms }}-комнатная квартира</h2>
                 </div>
-                <h2>{{ listing_info.listing.price }}$ {{ listing_info.listing.rooms }}-комнатная квартира</h2>
-            </div>
+            </a>
         {% endfor %}
     </div>
 
