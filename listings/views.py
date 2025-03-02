@@ -4,6 +4,7 @@ from django.core.files.storage import default_storage
 from listings.models import *
 import base64
 from io import BytesIO
+from .services import get_predicted_price
 
 
 def show_all_listings(request):
@@ -95,11 +96,31 @@ def show_listing_detail(request, listing_id):
     comments = listing.comments.all().order_by('-created_at')  # Все комментарии, сортированные по дате
     pictures = listing.pictures.all()  # Все изображения объявления
 
+    flat_data = {
+        'room_num': listing.rooms,
+        'address': listing.address,
+        'offer_type': listing_details.listing_type,
+        'series': listing_details.apartment_series,
+        'heating': listing_details.heating,
+        'condition': listing_details.condition,
+        'furniture': listing_details.furniture,
+        'area': listing_details.area,
+        'floor': listing_details.floor,
+        'total_floors': listing_details.total_floors,
+        'building_year': listing_details.year_built,
+        'wall_material': listing_details.wall_material,
+        'developer': listing_details.developer,
+        'region': listing_details.region,
+        'city': listing_details.city,
+    }
+
+    predicted_price = get_predicted_price.get_predicted_price(flat_data)
     context = {
         'listing': listing,
         'listing_details': listing_details,
         'comments': comments,
         'pictures': pictures,
+        'predicted_price': predicted_price
     }
 
     return render(request, 'listings/listing_detail.html', context)

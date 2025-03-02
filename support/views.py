@@ -6,6 +6,8 @@ from .models import Appeal, AppealPicture
 
 @login_required
 def support(request):
+    if request.user.role == 'support':
+        return redirect('appeals')
     if request.method == "POST":
         text = request.POST.get("message", "").strip()
 
@@ -27,3 +29,12 @@ def support(request):
                                                                    'свяжется с вами в ближайшее время!'})
 
     return render(request, 'support/support.html')
+
+
+@login_required
+def show_appeals(request):
+    # Получаем все обращения вместе с картинками
+    appeals = Appeal.objects.filter(closed=False).order_by('-created_at')
+
+    # Передаем их в контекст
+    return render(request, 'support/appeals.html', {'appeals': appeals})

@@ -1,0 +1,23 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-3">Все обращения</h2>
+
+        {% if appeals %}
+            <div class="row">
+                {% for appeal in appeals %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card p-3">
+                            <h5>Обращение #{{ appeal.id }}</h5>
+                            <p><strong>Пользователь:</strong> {{ appeal.user.username }}</p>
+                            <p><strong>Дата создания:</strong> {{ appeal.created_at }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Нет обращений.</p>
+        {% endif %}
+    </div>
+{% endblock %}
