@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import base64
 from io import BytesIO
-from .services import get_predicted_price, main_chat
+from .services import get_predicted_price, main_chat, listing_chat
 
 
 def show_all_listings(request):
