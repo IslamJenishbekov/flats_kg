@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from users.forms import CustomUserCreationForm
@@ -24,5 +24,7 @@ class RegisterUser(CreateView):
 
 def show_user_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
+    if request.user == user:
+        return redirect('users:profile')
     return render(request, 'users/another_profile.html', {'user': user})
 

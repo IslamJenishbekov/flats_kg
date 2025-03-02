@@ -25,6 +25,7 @@ urlpatterns = [
     path('chats/', include('chats.urls')),
     path('listings/', include('listings.urls')),
     path('common/', include('common.urls')),
+    path('support/', include('support.urls')),
     path('', lambda request: redirect('listings/all', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

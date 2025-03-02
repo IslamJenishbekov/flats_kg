@@ -1,0 +1,29 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-3">Свяжитесь с поддержкой</h2>
+
+        <!-- Вывод сообщения, если оно есть -->
+        {% if message %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="message" class="form-label">Ваше сообщение</label>
+                <textarea class="form-control" id="message" name="message" rows="4"
+                          placeholder="Опишите вашу проблему..."></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="file" class="form-label">Прикрепить изображения (jpeg):</label>
+                <input class="form-control" type="file" id="file" name="file" accept="image/jpeg" multiple>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+    </div>
+{% endblock %}
