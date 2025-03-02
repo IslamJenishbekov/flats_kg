@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def tell_about(request):
+    return render(request, 'common/about.html')
