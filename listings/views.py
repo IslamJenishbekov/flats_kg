@@ -2,9 +2,11 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
 from listings.models import *
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import base64
 from io import BytesIO
-from .services import get_predicted_price
+from .services import get_predicted_price, main_chat
 
 
 def show_all_listings(request):
@@ -124,3 +126,48 @@ def show_listing_detail(request, listing_id):
     }
 
     return render(request, 'listings/listing_detail.html', context)
+
+
+@csrf_exempt
+def main_chat_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        message = data.get('message', '')
+
+        response = main_chat.get_response(message)
+
+        return JsonResponse({'response': response})
+
+
+@csrf_exempt
+def listing_chat_view(request):
+    if request.method == 'POST':
+        data = json.loads(request)
+        message = data.get('message', '')
+        listing_id = data.get('listing_id', '')
+
+        listing = get_object_or_404(Listing, id=listing_id)
+        listing_details = listing.details
+
+        flat_data = {
+            'room_num': listing.rooms,
+            'address': listing.address,
+            'offer_type': listing_details.listing_type,
+            'series': listing_details.apartment_series,
+            'heating': listing_details.heating,
+            'condition': listing_details.condition,
+            'furniture': listing_details.furniture,
+            'area': listing_details.area,
+            'floor': listing_details.floor,
+            'total_floors': listing_details.total_floors,
+            'building_year': listing_details.year_built,
+            'wall_material': listing_details.wall_material,
+            'developer': listing_details.developer,
+            'region': listing_details.region,
+            'city': listing_details.city,
+        }
+
+
+        response = listing_chat.get_response(message, flat_data)
+
+        return response

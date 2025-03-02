@@ -51,13 +51,61 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 0; /* Отключаем скругление углов */
+            border-radius: 0;
         }
 
         /* Текст "Нет изображения" */
         .picture p {
             color: #888;
             font-size: 14px;
+        }
+
+        /* Чат-ассистент */
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+        #chat-toggle {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        #chat-box {
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            padding: 10px;
+            display: none;
+        }
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        #chat-input {
+            width: 80%;
+            padding: 5px;
+        }
+        #send-message {
+            width: 18%;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
     </style>
 
@@ -83,5 +131,56 @@
         {% endfor %}
     </div>
 
-{% endblock %}
+    <!-- Чат-ассистент -->
+    <div id="chat-container">
+        <button id="chat-toggle">💬</button>
+        <div id="chat-box">
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-input" placeholder="Введите сообщение...">
+            <button id="send-message">Отправить</button>
+        </div>
+    </div>
 
+    <script>
+        document.getElementById("chat-toggle").addEventListener("click", function() {
+            let chatBox = document.getElementById("chat-box");
+            chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
+        });
+
+        document.getElementById("send-message").addEventListener("click", function() {
+            let inputField = document.getElementById("chat-input");
+            let message = inputField.value;
+            if (message) {
+                document.getElementById("chat-messages").innerHTML += "<div>Вы: " + message + "</div>";
+                inputField.value = "";
+                fetch("{% url 'main_chat_assistant' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken")
+                    },
+                    body: JSON.stringify({ "message": message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("chat-messages").innerHTML += "<div>Бот: " + data.response + "</div>";
+                });
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                let cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+{% endblock %}
