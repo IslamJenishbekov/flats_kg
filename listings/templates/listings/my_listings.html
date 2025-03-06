@@ -1,86 +1,43 @@
 {% extends 'base_generic.html' %}
 
-{% block content %}
-    <h1 style="text-align: center; margin-bottom: 20px;">Мои объявления</h1>
+{% block content %}<div class="flex flex-col items-center p-5">
+        <h1 class="text-2xl font-bold mb-5">Мои объявления</h1>
 
-    <style>
-        /* Контейнер всех объявлений */
-        .listings-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        /* Карточка объявления */
-        .listing {
-            width: 320px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .listing:hover {
-            transform: scale(1.03);
-        }
-
-        /* Заголовок объявления */
-        .listing h2 {
-            text-align: center;
-            font-size: 18px;
-            margin: 15px 10px;
-            color: #333;
-        }
-
-        /* Блок изображения */
-        .picture {
-            width: 100%;
-            height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background-color: #f0f0f0;
-        }
-
-        /* Стили для изображения */
-        .picture img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 0; /* Отключаем скругление углов */
-        }
-
-        /* Текст "Нет изображения" */
-        .picture p {
-            color: #888;
-            font-size: 14px;
-        }
-    </style>
-
-    <div class="listings-container">
-        {% for listing_info in listings_with_pictures %}
-            <a href="{% url 'listing_detail' listing_info.listing.id %}" style="text-decoration: none; color: inherit;">
-                <div class="listing">
-                    <div class="picture">
-                        {% if listing_info.picture %}
-                            {% if listing_info.picture.image_base64 %}
-                                <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}"
-                                     alt="Listing Picture">
-                            {% else %}
-                                <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture">
-                            {% endif %}
-                        {% else %}
-                            <p>Нет изображения</p>
-                        {% endif %}
+        <div class="w-full max-w-7xl">
+            {% for listing_info in listings_with_pictures %}
+                <a href="{% url 'listing_detail' listing_info.listing.id %}" class="no-underline text-inherit">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col md:flex-row mb-5">
+                        <div class="w-full md:w-1/3">
+                            <div class="h-48 md:h-64 flex justify-center items-center overflow-hidden bg-gray-100">
+                                {% if listing_info.picture %}
+                                    {% if listing_info.picture.image_base64 %}
+                                        <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}" alt="Listing Picture" class="w-full h-full object-cover">
+                                    {% else %}
+                                        <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture" class="w-full h-full object-cover">
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-gray-500 text-sm">Нет изображения</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="w-full md:w-2/3 p-4 md:p-6">
+                            <h2 class="text-xl font-bold mb-2 text-gray-800">{{ listing_info.listing.rooms }}-комн. апартаменты, {{ listing_info.listing.details.area }} м², {{ listing_info.listing.details.floor }}/{{ listing_info.listing.details.total_floors }} этаж</h2>
+                            <div class="mb-4">
+                                <p class="text-gray-600"><strong>С отделкой</strong></p>
+                                <p class="text-gray-600">ЖК «{{ listing_info.listing.details.developer }}»</p>
+                                <p class="text-gray-600">сдача ГК: 3 кв. {{ listing_info.listing.details.year_built }} года</p>
+                                <p class="text-gray-600">{{ listing_info.listing.address }}</p>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <div class="text-2xl font-bold text-gray-800">
+                                    {{ listing_info.listing.price }} ₽
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mt-4 hidden md:block">Продаются апартаменты общей площадью {{ listing_info.listing.details.area }} кв. м. с {{ listing_info.listing.rooms }}-мя спальнями и кухней-гостиной. Компания {{ listing_info.listing.details.developer }} представляет проект "{{ listing_info.listing.details.project_name }}" в исключительной локации — на {{ listing_info.listing.details.location }}.</p>
+                        </div>
                     </div>
-                    <h2>{{ listing_info.listing.price }}$ {{ listing_info.listing.rooms }}-комнатная квартира</h2>
-                </div>
-            </a>
-        {% endfor %}
+                </a>
+            {% endfor %}
+        </div>
     </div>
-
 {% endblock %}
