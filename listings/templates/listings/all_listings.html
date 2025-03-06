@@ -1,170 +1,236 @@
 {% extends 'base_generic.html' %}
-
 {% block content %}
-    <h1 style="text-align: center; margin-bottom: 20px;">Объявления</h1>
 
-    <style>
-        /* Контейнер всех объявлений */
-        .listings-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
+    <div class="flex flex-col items-center p-5">
+        <h1 class="text-2xl font-bold mb-5">Объявления</h1>
 
-        /* Карточка объявления */
-        .listing {
-            width: 320px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
 
-        .listing:hover {
-            transform: scale(1.03);
-        }
-
-        /* Заголовок объявления */
-        .listing h2 {
-            text-align: center;
-            font-size: 18px;
-            margin: 15px 10px;
-            color: #333;
-        }
-
-        /* Блок изображения */
-        .picture {
-            width: 100%;
-            height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background-color: #f0f0f0;
-        }
-
-        /* Стили для изображения */
-        .picture img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 0;
-        }
-
-        /* Текст "Нет изображения" */
-        .picture p {
-            color: #888;
-            font-size: 14px;
-        }
-
-        /* Чат-ассистент */
-        #chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-        }
-        #chat-toggle {
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        #chat-box {
-            width: 300px;
-            height: 400px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            bottom: 60px;
-            right: 0;
-            padding: 10px;
-            display: none;
-        }
-        #chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
-        }
-        #chat-input {
-            width: 80%;
-            padding: 5px;
-        }
-        #send-message {
-            width: 18%;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
-
-    <div class="listings-container">
-        {% for listing_info in listings_with_pictures %}
-            <a href="{% url 'listing_detail' listing_info.listing.id %}" style="text-decoration: none; color: inherit;">
-                <div class="listing">
-                    <div class="picture">
-                        {% if listing_info.picture %}
-                            {% if listing_info.picture.image_base64 %}
-                                <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}"
-                                     alt="Listing Picture">
-                            {% else %}
-                                <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture">
-                            {% endif %}
-                        {% else %}
-                            <p>Нет изображения</p>
-                        {% endif %}
-                    </div>
-                    <h2>{{ listing_info.listing.price }}$ {{ listing_info.listing.rooms }}-комнатная квартира</h2>
+        <div class="filters bg-gray-50 p-6 rounded-lg shadow-md mb-6 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Тип недвижимости</label>
+                    <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        <option>Квартира</option>
+                        <option>Дом</option>
+                        <option>Комната</option>
+                    </select>
                 </div>
-            </a>
-        {% endfor %}
-    </div>
 
-    <!-- Чат-ассистент -->
-    <div id="chat-container">
-        <button id="chat-toggle">💬</button>
-        <div id="chat-box">
-            <div id="chat-messages"></div>
-            <input type="text" id="chat-input" placeholder="Введите сообщение...">
-            <button id="send-message">Отправить</button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Кол-во комнат</label>
+                    <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4+</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Регион</label>
+                    <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        <option>Любой</option>
+                        <option>Москва</option>
+                        <option>Санкт-Петербург</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Цена</label>
+                    <div class="flex gap-2">
+                        <input type="number" placeholder="От"
+                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        <input type="number" placeholder="До"
+                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Этаж</label>
+                    <div class="flex gap-2">
+                        <input type="number" placeholder="От"
+                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        <input type="number" placeholder="До"
+                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Дополнительно</label>
+                    <div class="mt-1 space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="ml-2">От собственника</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="ml-2">Есть фото</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="ml-2">Срочно</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-4">
+                <button class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">Очистить</button>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Применить</button>
+            </div>
+        </div>
+
+        <div class="w-full max-w-7xl">
+            {% for listing_info in listings_with_pictures %}
+                <a href="{% url 'listing_detail' listing_info.listing.id %}" class="no-underline text-inherit">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col md:flex-row mb-5">
+                        <div class="w-full md:w-1/3">
+                            <div class="h-48 md:h-64 flex justify-center items-center overflow-hidden bg-gray-100">
+                                {% if listing_info.picture %}
+                                    {% if listing_info.picture.image_base64 %}
+                                        <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}"
+                                             alt="Listing Picture" class="w-full h-full object-cover">
+                                    {% else %}
+                                        <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture"
+                                             class="w-full h-full object-cover">
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-gray-500 text-sm">Нет изображения</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="w-full md:w-2/3 p-4 md:p-6">
+                            <h2 class="text-xl font-bold mb-2 text-gray-800">{{ listing_info.listing.rooms }}-комн.
+                                апартаменты, {{ listing_info.listing.details.area }}
+                                м², {{ listing_info.listing.details.floor }}/{{ listing_info.listing.details.total_floors }}
+                                этаж</h2>
+                            <div class="mb-4">
+                                <p class="text-gray-600"><strong>С отделкой</strong></p>
+                                <p class="text-gray-600">ЖК «{{ listing_info.listing.details.developer }}»</p>
+                                <p class="text-gray-600">сдача ГК: 3 кв. {{ listing_info.listing.details.year_built }}
+                                    года</p>
+                                <p class="text-gray-600">{{ listing_info.listing.address }}</p>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <div class="text-2xl font-bold text-gray-800">
+                                    {{ listing_info.listing.price }} ₽
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mt-4 hidden md:block">Продаются апартаменты общей
+                                площадью {{ listing_info.listing.details.area }} кв. м.
+                                с {{ listing_info.listing.rooms }}-мя спальнями и кухней-гостиной.
+                                Компания {{ listing_info.listing.details.developer }} представляет проект
+                                "{{ listing_info.listing.details.project_name }}" в исключительной локации —
+                                на {{ listing_info.listing.details.location }}.</p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+        <div id="chat-container" class="fixed bottom-6 right-6">
+            <button id="chat-toggle"
+                    class="bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all transform hover:scale-110">
+                💬
+            </button>
+
+            <div id="chat-box"
+                 class="hidden absolute bottom-20 right-0 w-96 bg-white rounded-lg shadow-xl flex flex-col p-4 transition-all duration-300 ease-in-out">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">Чат-бот</h2>
+                    <button id="close-chat" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="chat-messages" class="flex-1 overflow-y-auto mb-4 space-y-2">
+
+                    <div class="flex justify-start">
+                        <div class="bg-gray-100 p-3 rounded-lg max-w-[80%]">
+                            <p class="text-sm text-gray-700">Привет! Чем могу помочь?</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[80%]">
+                            <p class="text-sm">Привет!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Введите сообщение..."
+                           class="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="send-message"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Отправить
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
+
     <script>
-        document.getElementById("chat-toggle").addEventListener("click", function() {
-            let chatBox = document.getElementById("chat-box");
-            chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
+        const chatToggle = document.getElementById("chat-toggle");
+        const chatBox = document.getElementById("chat-box");
+        const closeChat = document.getElementById("close-chat");
+
+        chatToggle.addEventListener("click", () => {
+            chatBox.classList.toggle("hidden");
         });
 
-        document.getElementById("send-message").addEventListener("click", function() {
-            let inputField = document.getElementById("chat-input");
-            let message = inputField.value;
+        closeChat.addEventListener("click", () => {
+            chatBox.classList.add("hidden");
+        });
+        const chatInput = document.getElementById("chat-input");
+        const chatMessages = document.getElementById("chat-messages");
+        const sendMessageButton = document.getElementById("send-message");
+
+        sendMessageButton.addEventListener("click", () => {
+            const message = chatInput.value.trim();
             if (message) {
-                document.getElementById("chat-messages").innerHTML += "<div>Вы: " + message + "</div>";
-                inputField.value = "";
+
+                chatMessages.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[80%]">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `;
+                chatInput.value = "";
+
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
                 fetch("{% url 'main_chat_assistant' %}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRFToken": getCookie("csrftoken")
                     },
-                    body: JSON.stringify({ "message": message })
+                    body: JSON.stringify({"message": message})
                 })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("chat-messages").innerHTML += "<div>Бот: " + data.response + "</div>";
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        chatMessages.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="bg-gray-100 p-3 rounded-lg max-w-[80%]">
+                            <p class="text-sm text-gray-700">${data.response}</p>
+                        </div>
+                    </div>
+                `;
+
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    });
+            }
+        });
+
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                sendMessageButton.click();
             }
         });
 
