@@ -1,35 +1,247 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-    <h1>Объявление №{{ listing.id }}</h1>
-    <p>
-        <strong>Пользователь:</strong>
-        <a href="{% url 'users:another_profile' user_id=listing.user.id %}" class="text-blue-600 hover:underline">
-            {{ listing.user.username }}
-        </a>
-    </p>
-    <p><strong>Адрес:</strong> {{ listing.address }}</p>
-    <p><strong>Цена:</strong> {{ listing.price }} USD</p>
-    <p><strong>Комнат:</strong> {{ listing.rooms }}</p>
-    <p><strong>Площадь:</strong> {{ listing_details.area }} м²</p>
-    <p><strong>Этаж:</strong> {{ listing_details.floor }} из {{ listing_details.total_floors }}</p>
-    <p><strong>Год постройки:</strong> {{ listing_details.year_built }}</p>
-    <p><strong>Материал стен:</strong> {{ listing_details.wall_material }}</p>
-    <p><strong>Разработчик:</strong> {{ listing_details.developer }}</p>
-    <p><strong>Описание:</strong> {{ listing_details.description }}</p>
-    <p><strong>Адрес</strong> {{ listing.address }}</p>
+    <div class="flex flex-col flex-grow justify-center bg-gray-50 py-8">
 
-    <h2>Фотографии</h2>
-    {% for picture in pictures %}
-        <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления" width="300">
-    {% empty %}
-        <p>Нет фотографий</p>
-    {% endfor %}
+        <div class="max-w-7xl w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
 
-    <h2>Комментарии</h2>
-    {% for comment in comments %}
-        <p><strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
-    {% empty %}
-        <p>Комментариев пока нет</p>
-    {% endfor %}
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Объявление за {{ listing.price }}
+                    $</h1>
+                <p class="text-lg text-gray-600 mt-2">{{ listing.details.region }}, {{ listing.details.city }}</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="relative">
+                    <div class="carousel-container overflow-hidden rounded-lg">
+                        <div class="carousel-track flex transition-transform duration-500 ease-in-out">
+                            {% for picture in pictures %}
+                                <div class="carousel-slide min-w-full">
+                                    <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления"
+                                         class="w-full h-[500px] object-cover rounded-lg cursor-zoom-in"
+                                         onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}  ')">
+                                </div>
+                            {% empty %}
+                                <p class="text-gray-600">Нет фотографий</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button class="carousel-prev absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+                        &larr;
+                    </button>
+                    <button class="carousel-next absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+                        &rarr;
+                    </button>
+                    <div class="flex mt-4 space-x-2 overflow-x-auto">
+                        {% for picture in pictures %}
+                            <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Миниатюра"
+                                 class="w-20 h-20 object-cover rounded-lg cursor-pointer"
+                                 onclick="goToSlide({{ forloop.counter0 }})">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Основные характеристики</h2>
+                        <div class="grid grid-cols-2 gap-4">
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-building text-2xl text-blue-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Тип объекта</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.listing_type }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-ruler-combined text-2xl text-green-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Площадь</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.area }} м²</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-layer-group text-2xl text-purple-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Этаж</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.floor }}
+                                        из {{ listing.details.total_floors }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-calendar-alt text-2xl text-yellow-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Год постройки</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.year_built }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-home text-2xl text-red-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Материал стен</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.wall_material }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-fire text-2xl text-orange-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Отопление</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.heating }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-paint-roller text-2xl text-indigo-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Состояние</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.condition }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-couch text-2xl text-pink-500"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Мебель</p>
+                                    <p class="text-lg text-gray-900">{{ listing.details.furniture }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Описание</h2>
+                        <p class="text-lg text-gray-700">{{ listing.details.description }}</p>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
+                        <button onclick="openContactModal()"
+                                class="w-full bg-yellow-400 text-white font-semibold py-3 rounded-lg hover:bg-yellow-500 transition duration-300">
+                            Показать контакты
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Комментарии</h2>
+                <div class="space-y-4">
+                    {% for comment in comments %}
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <p class="text-sm font-medium text-gray-600">{{ comment.user.username }}</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ comment.comment }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-gray-600">Комментариев пока нет</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="relative">
+            <img id="modalImage" src="" alt="Увеличенное фото" class="max-w-full max-h-screen">
+            <button onclick="closeModal()"
+                    class="absolute top-4 right-4 text-white text-2xl bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75">
+                &times;
+            </button>
+        </div>
+    </div>
+
+    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-lg w-11/12 max-w-md">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Контакты</h2>
+            <div class="space-y-4">
+                {% if listing.user.tg_link %}
+                    <div class="flex items-center space-x-3">
+                        <i class="fab fa-telegram text-2xl text-blue-500"></i>
+                        <a href="{{ listing.user.tg_link }}"
+                           class="text-lg text-gray-700 hover:text-blue-500 transition duration-300" target="_blank">
+                            {{ listing.user.tg_link }}
+                        </a>
+                    </div>
+                {% endif %}
+                {% if listing.user.tel_number %}
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-phone-alt text-2xl text-green-500"></i>
+                        <a href="tel:{{ listing.user.tel_number }}"
+                           class="text-lg text-gray-700 hover:text-green-500 transition duration-300">
+                            {{ listing.user.tel_number }}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <button onclick="closeContactModal()"
+                    class="mt-6 w-full bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition duration-300">
+                Закрыть
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const carouselTrack = document.querySelector('.carousel-track');
+        const carouselSlides = document.querySelectorAll('.carousel-slide');
+        const prevButton = document.querySelector('.carousel-prev');
+        const nextButton = document.querySelector('.carousel-next');
+        const thumbnails = document.querySelectorAll('.carousel-thumbnail');
+
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            const offset = -currentIndex * 100;
+            carouselTrack.style.transform = `translateX(${offset}%)`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = carouselSlides.length - 1;
+            }
+            updateCarousel();
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < carouselSlides.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateCarousel();
+        });
+
+        function goToSlide(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+        }
+
+        function openContactModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeContactModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.add('hidden');
+        }
+    </script>
 {% endblock %}
