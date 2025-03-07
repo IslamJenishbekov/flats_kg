@@ -1,5 +1,48 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-    <p>About us</p>
+    <div class="flex flex-col items-center justify-center bg-gray-50 py-12">
+        <div class="max-w-4xl w-full bg-white p-8 rounded-lg shadow-lg">
+            <h1 class="text-4xl font-bold text-gray-900 text-center mb-8">О нас</h1>
+
+            <div class="space-y-6 mb-6">
+                <p class="text-lg text-gray-700">
+                    Добро пожаловать на наш проект! Мы создали эту платформу, чтобы помочь людям находить идеальное жилье, будь то квартира, дом или коммерческая недвижимость. Наш проект вдохновлен такими платформами, как <strong>house.kg</strong>, но мы пошли дальше и добавили уникальные функции, которые делают процесс поиска и оценки недвижимости еще более удобным и точным.
+                </p>
+
+                <p class="text-lg text-gray-700">
+                    Одна из наших ключевых инноваций — это <strong>модель расчета цены квартиры</strong>, которая учитывает множество факторов, таких как местоположение, площадь, состояние объекта, инфраструктура района и многое другое. Это позволяет нашим пользователям получать более точную оценку стоимости недвижимости и принимать обоснованные решения.
+                </p>
+
+                <p class="text-lg text-gray-700">
+                    Мы стремимся сделать рынок недвижимости более прозрачным и доступным для всех. Наша команда постоянно работает над улучшением платформы, добавляя новые функции и улучшая существующие, чтобы сделать ваш опыт максимально комфортным.
+                </p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">Участники команды</h2>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+                    <img src="https://via.placeholder.com/150" alt="Создатель 1" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">Ислам Женишбеков</h3>
+                    <p class="text-lg text-gray-600">Основатель, CEO, Филантроп, Плейбой, Миллиардер</p>
+                    <p class="text-sm text-gray-500 mt-2">Вообще лучший пушка мужчина</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+                    <img src="https://via.placeholder.com/150" alt="Создатель 2" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">Жоомарт Суранбаев</h3>
+                    <p class="text-lg text-gray-600">Главный аналитик</p>
+                    <p class="text-sm text-gray-500 mt-2">Жома разрабатывает модели анализа данных и отвечает за точность расчетов, в общем занимается умными вещами.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+                    <img src="https://via.placeholder.com/150" alt="Создатель 3" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">Сейтек Аскарбеков</h3>
+                    <p class="text-lg text-gray-600">Разработчик</p>
+                    <p class="text-sm text-gray-500 mt-2">Случайно оказался тут, вообще ноунейм.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
