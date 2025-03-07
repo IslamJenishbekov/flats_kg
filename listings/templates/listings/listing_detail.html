@@ -6,20 +6,19 @@
         <div class="max-w-7xl w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
 
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Объявление за {{ listing.price }}
-                    $</h1>
+                <h1 class="text-3xl font-bold text-gray-900">Объявление за {{ listing.price }} $</h1>
                 <p class="text-lg text-gray-600 mt-2">{{ listing.details.region }}, {{ listing.details.city }}</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="relative">
-                    <div class="carousel-container overflow-hidden rounded-lg">
+            <div class="grid grid-cols-1 lg:grid-cols-11 gap-8">
+                <div class="relative col-span-4">
+                    <div class="carousel-container overflow-hidden rounded-lg  h-[200px]">
                         <div class="carousel-track flex transition-transform duration-500 ease-in-out">
                             {% for picture in pictures %}
                                 <div class="carousel-slide min-w-full">
                                     <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления"
-                                         class="w-full h-[500px] object-cover rounded-lg cursor-zoom-in"
-                                         onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}  ')">
+                                         class="rounded-lg cursor-zoom-in"
+                                         onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}')">
                                 </div>
                             {% empty %}
                                 <p class="text-gray-600">Нет фотографий</p>
@@ -41,12 +40,25 @@
                     </div>
                 </div>
 
-                <div class="space-y-6">
+                <div class="space-y-6 col-span-7">
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-3xl font-bold text-gray-900">{{ listing.price }} $</h1>
+                            </div>
 
+                            <button id="likeButton"
+                                    class="flex items-center space-x-2 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition duration-300"
+                                    onclick="toggleLike()">
+                                <i id="likeIcon" class="far fa-heart text-2xl text-gray-600"></i>
+                                <span id="likeCount"
+                                      class="text-lg text-gray-600">{{ listing.details.num_likes }}</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="bg-gray-50 p-6 rounded-lg">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4">Основные характеристики</h2>
                         <div class="grid grid-cols-2 gap-4">
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-building text-2xl text-blue-500"></i>
                                 <div>
@@ -113,22 +125,21 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Описание</h2>
-                        <p class="text-lg text-gray-700">{{ listing.details.description }}</p>
-                    </div>
-
-                    <div class="bg-gray-50 p-6 rounded-lg">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
-                        <button onclick="openContactModal()"
-                                class="w-full bg-yellow-400 text-white font-semibold py-3 rounded-lg hover:bg-yellow-500 transition duration-300">
-                            Показать контакты
-                        </button>
-                    </div>
                 </div>
             </div>
 
+            <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Описание</h2>
+                <p class="text-lg text-gray-700">{{ listing.details.description }}</p>
+            </div>
+
+            <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
+                <button onclick="openContactModal()"
+                        class="w-full bg-yellow-400 text-white font-semibold py-3 rounded-lg hover:bg-yellow-500 transition duration-300">
+                    Показать контакты
+                </button>
+            </div>
             <div class="mt-8 bg-gray-50 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">Комментарии</h2>
                 <div class="space-y-4">
@@ -143,6 +154,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
@@ -155,7 +167,8 @@
         </div>
     </div>
 
-    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+    <div id="contactModal"
+         class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
         <div class="bg-white p-8 rounded-lg w-11/12 max-w-md">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Контакты</h2>
             <div class="space-y-4">
@@ -163,7 +176,8 @@
                     <div class="flex items-center space-x-3">
                         <i class="fab fa-telegram text-2xl text-blue-500"></i>
                         <a href="{{ listing.user.tg_link }}"
-                           class="text-lg text-gray-700 hover:text-blue-500 transition duration-300" target="_blank">
+                           class="text-lg text-gray-700 hover:text-blue-500 transition duration-300"
+                           target="_blank">
                             {{ listing.user.tg_link }}
                         </a>
                     </div>
@@ -243,5 +257,23 @@
             const modal = document.getElementById('contactModal');
             modal.classList.add('hidden');
         }
+
+        function toggleLike() {
+        const likeIcon = document.getElementById('likeIcon');
+        const likeCount = document.getElementById('likeCount');
+        let isLiked = likeIcon.classList.contains('fas');
+
+        if (isLiked) {
+            likeIcon.classList.remove('fas');
+            likeIcon.classList.add('far');
+            likeCount.textContent = parseInt(likeCount.textContent) - 1;
+        } else {
+            likeIcon.classList.remove('far');
+            likeIcon.classList.add('fas');
+            likeCount.textContent = parseInt(likeCount.textContent) + 1;
+        }
+
+        // Тут нужно написать запрос на обновление лайков Ислам, я пока не знаю как это сделать
+    }
     </script>
 {% endblock %}
