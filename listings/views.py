@@ -2,15 +2,17 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
 from listings.models import *
+from moderation.models import Blocking
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import base64
 from io import BytesIO
 from .services import get_predicted_price, main_chat, listing_chat
+from django.contrib import messages
 
 
 def show_all_listings(request):
-    listings = Listing.objects.all()
+    listings = Listing.objects.filter(is_blocked=False)
     listings_with_pictures = [
         {
             'listing': listing,
@@ -93,6 +95,38 @@ def show_my_listings(request):
 
 
 def show_listing_detail(request, listing_id):
+    if request.method == "POST" and request.user.role == 'moderator':
+        listing_id = request.POST.get('listing_id')
+        reason = request.POST.get('reason')
+
+        listing = get_object_or_404(Listing, id=listing_id)
+        user = get_object_or_404(User, id=listing.user.id)
+
+        blocking = Blocking(blocking_cause=reason, listing=listing)
+        blocking.save()
+
+        listing.is_blocked = True
+        listing.save(update_fields=['is_blocked'])
+
+        messages.success(request, "Объявление успешно заблокировано!")
+        return redirect("all_listings")
+
+    if request.method == "POST" and 'toggle_like' in request.POST:
+        listing = get_object_or_404(Listing, id=listing_id)
+        user = get_object_or_404(User, id=request.user.id)
+        # Проверяем, что пользователь не автор
+        if request.user != listing.user:
+            listing_details = get_object_or_404(ListingDetail, listing_id=listing.id)
+            if Favorites.objects.filter(user=user, listing=listing).exists():
+                # Удаляем лайк
+                listing_details.num_likes -= 1
+                Favorites.objects.filter(user=user, listing=listing).delete()
+            else:
+                listing_details.num_likes += 1
+                favorite = Favorites(user=user, listing=listing)
+                favorite.save()
+            listing_details.save()
+
     listing = get_object_or_404(Listing, id=listing_id)
     listing_details = listing.details  # Получаем связанные детали объявления
     comments = listing.comments.all().order_by('-created_at')  # Все комментарии, сортированные по дате
@@ -167,7 +201,18 @@ def listing_chat_view(request):
             'city': listing_details.city,
         }
 
-
         response = listing_chat.get_response(message, flat_data)
 
         return response
+
+
+def show_my_favorites(request):
+    favorite_listings = Listing.objects.filter(favorites__user=request.user)
+    listings_with_pictures = [
+        {
+            'listing': listing,
+            'picture': ListingPicture.objects.filter(listing=listing).first()
+        }
+        for listing in favorite_listings
+    ]
+    return render(request, 'listings/my_favorite_listings.html', {'listings_with_pictures': listings_with_pictures})

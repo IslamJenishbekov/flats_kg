@@ -46,14 +46,19 @@
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">{{ listing.price }} $</h1>
                             </div>
-
-                            <button id="likeButton"
-                                    class="flex items-center space-x-2 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition duration-300"
-                                    onclick="toggleLike()">
-                                <i id="likeIcon" class="far fa-heart text-2xl text-gray-600"></i>
-                                <span id="likeCount"
-                                      class="text-lg text-gray-600">{{ listing.details.num_likes }}</span>
-                            </button>
+                            {% if request.user.is_authenticated and request.user.id != listing.user.id %}
+                                <form id="likeForm" method="post" action="{% url 'listing_detail' listing.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="toggle_like" value="true">
+                                    <button id="likeButton" type="submit"
+                                            class="flex items-center space-x-2 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition duration-300">
+                                        <i id="likeIcon"
+                                           class="far fa-heart text-2xl"></i>
+                                        <span id="likeCount"
+                                              class="text-lg text-gray-600">{{ listing.details.num_likes }}</span>
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="bg-gray-50 p-6 rounded-lg">
@@ -140,6 +145,39 @@
                     Показать контакты
                 </button>
             </div>
+
+            {% if user.role == "moderator" %}
+                <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                    <form method="post" action="{% url 'listing_detail' listing.id %}" id="blockForm">
+                        {% csrf_token %}
+
+                        <!-- Скрытые поля -->
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                        <input type="hidden" name="reason" id="blockReasonInput">
+
+                        <!-- Кнопка заблокировать с подтверждением -->
+                        <button type="button" onclick="submitBlockForm()"
+                                class="w-full bg-red-400 text-white font-semibold py-3 rounded-lg hover:bg-red-500 transition duration-300">
+                            Заблокировать объявление
+                        </button>
+                    </form>
+                </div>
+
+                <script>
+                    function submitBlockForm() {
+                        let reason = prompt("Введите причину блокировки:");
+                        if (reason && reason.trim() !== "") {
+                            // Устанавливаем значение в скрытое поле
+                            document.getElementById("blockReasonInput").value = reason.trim();
+                            // Отправляем форму
+                            document.getElementById("blockForm").submit();
+                        } else {
+                            alert("Причина блокировки обязательна!");
+                        }
+                    }
+                </script>
+            {% endif %}
+
             <div class="mt-8 bg-gray-50 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">Комментарии</h2>
                 <div class="space-y-4">
@@ -258,22 +296,5 @@
             modal.classList.add('hidden');
         }
 
-        function toggleLike() {
-        const likeIcon = document.getElementById('likeIcon');
-        const likeCount = document.getElementById('likeCount');
-        let isLiked = likeIcon.classList.contains('fas');
-
-        if (isLiked) {
-            likeIcon.classList.remove('fas');
-            likeIcon.classList.add('far');
-            likeCount.textContent = parseInt(likeCount.textContent) - 1;
-        } else {
-            likeIcon.classList.remove('far');
-            likeIcon.classList.add('fas');
-            likeCount.textContent = parseInt(likeCount.textContent) + 1;
-        }
-
-        // Тут нужно написать запрос на обновление лайков Ислам, я пока не знаю как это сделать
-    }
     </script>
 {% endblock %}

@@ -6,7 +6,6 @@ User = get_user_model()
 
 
 class Appeal(models.Model):
-    id = models.AutoField(primary_key=True)
     text = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="appeals")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -19,9 +18,14 @@ class Appeal(models.Model):
 
 
 class AppealPicture(models.Model):
-    id = models.AutoField(primary_key=True)
     image_base64 = models.TextField()
     appeal = models.ForeignKey(Appeal, on_delete=models.CASCADE, related_name='pictures')
 
     def __str__(self):
         return f"Picture {self.id} for Appeal {self.appeal.id}"
+
+
+class AppealStatus(models.Model):
+    appeal = models.ForeignKey(Appeal, on_delete=models.CASCADE, related_name="appeal_status")
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now=True)

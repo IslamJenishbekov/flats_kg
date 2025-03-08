@@ -1,7 +1,8 @@
 import base64
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Appeal, AppealPicture
+from .models import Appeal, AppealPicture, AppealStatus
+from django.utils.timezone import now
 
 
 @login_required
@@ -34,7 +35,41 @@ def support(request):
 @login_required
 def show_appeals(request):
     # Получаем все обращения вместе с картинками
-    appeals = Appeal.objects.filter(closed=False).order_by('-created_at')
+    appeals = Appeal.objects.filter(closed=False).order_by('-last_answered_at')
 
     # Передаем их в контекст
     return render(request, 'support/appeals.html', {'appeals': appeals})
+
+
+@login_required()
+def work_with_appeal(request, appeal_id):
+    appeal = get_object_or_404(Appeal, id=appeal_id)
+    user = appeal.user
+    pictures = appeal.pictures.all()
+    statuses = appeal.appeal_status.all()
+
+    if request.method == "POST":
+        # Обработка закрытия обращения
+        if 'close_appeal' in request.POST:
+            appeal.closed = True
+            appeal.save()
+            AppealStatus.objects.create(
+                appeal=appeal,
+                comment="Обращение закрыто"
+            )
+            return redirect('appeals')
+
+        comment = request.POST.get("comment")  # Получаем текст комментария из формы
+        if comment:
+            AppealStatus.objects.create(appeal=appeal, comment=comment)
+            appeal.last_answered_at = now()
+            appeal.save(update_fields=['last_answered_at'])
+            return redirect("work_with_appeal", appeal_id=appeal.id)  # Перенаправляем на ту же страницу
+
+    context = {
+        'appeal': appeal,
+        'user': user,
+        'pictures': pictures,
+        'statuses': statuses
+    }
+    return render(request, 'support/work_with_appeal.html', context)

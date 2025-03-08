@@ -13,4 +13,5 @@ urlpatterns = [
                   path('main_chat_assistant/', views.main_chat_view, name='main_chat_assistant'),
                   path('listing_chat_assistant', views.listing_chat_view, name='listing_chat_assistant'),
                   path('users/', include('users.urls')),
+                  path('my_favorites/', views.show_my_favorites, name='my_favorites')
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

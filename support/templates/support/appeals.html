@@ -8,15 +8,20 @@
             {% if appeals %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for appeal in appeals %}
-                        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                            <h5 class="text-lg font-semibold text-gray-800 mb-2">Обращение #{{ appeal.id }}</h5>
-                            <p class="text-sm text-gray-600 mb-1">
-                                <strong>Пользователь:</strong> {{ appeal.user.username }}
-                            </p>
-                            <p class="text-sm text-gray-600">
-                                <strong>Дата создания:</strong> {{ appeal.created_at }}
-                            </p>
-                        </div>
+                        <a href="{% url 'work_with_appeal' appeal_id=appeal.id %}" class="block">
+                            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                                <h5 class="text-lg font-semibold text-gray-800 mb-2">Обращение #{{ appeal.id }}</h5>
+                                <p class="text-sm text-gray-600 mb-1">
+                                    <strong>Пользователь:</strong> {{ appeal.user.username }}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    <strong>Последний ответ:</strong> {{ appeal.last_answered_at }}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    <strong>Дата создания:</strong> {{ appeal.created_at }}
+                                </p>
+                            </div>
+                        </a>
                     {% endfor %}
                 </div>
             {% else %}

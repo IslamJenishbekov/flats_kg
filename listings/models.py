@@ -8,6 +8,8 @@ class Listing(models.Model):
     rooms = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     address = models.CharField(max_length=500)
+    num_likes = models.IntegerField(default=0)
+    is_blocked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -40,7 +42,6 @@ class ListingComment(models.Model):  # Переименовали PublishComment
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='comments')
     comment = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Связь с кастомным пользователем
-    num_likes = models.IntegerField(default=0)
     replied_comment = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -54,3 +55,10 @@ class ListingPicture(models.Model):
 
     def __str__(self):
         return f"Picture for Listing {self.listing.id}"
+
+
+class Favorites(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='favorites')
+
+

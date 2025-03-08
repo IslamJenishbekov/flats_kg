@@ -1,0 +1,64 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <h1>Обращение #{{ appeal.id }}</h1>
+
+    <!-- Информация об обращении -->
+    <div class="appeal-info">
+        <p><strong>Текст:</strong> {{ appeal.text }}</p>
+        <p><strong>Создано:</strong> {{ appeal.created_at }}</p>
+        <p><strong>Последний ответ:</strong> {{ appeal.last_answered_at }}</p>
+        <p><strong>Статус:</strong> {% if appeal.closed %}Закрыто{% else %}Открыто{% endif %}</p>
+    </div>
+
+    <!-- Информация о пользователе -->
+    <div class="user-info">
+        <h2>Пользователь</h2>
+        <p><strong>Имя:</strong> {{ appeal.user.username }}</p>
+        {% if appeal.user.avatar_base64 %}
+            <img src="data:image/jpeg;base64,{{ appeal.user.avatar_base64 }}" alt="Аватар" width="100">
+        {% endif %}
+    </div>
+
+    <!-- Картинки -->
+    <div class="pictures">
+        <h2>Приложенные изображения</h2>
+        {% for picture in pictures %}
+            <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Изображение" width="200">
+        {% empty %}
+            <p>Изображения отсутствуют</p>
+        {% endfor %}
+    </div>
+
+    <!-- Статусы -->
+    <div class="statuses">
+        <h2>История статусов</h2>
+        {% for status in statuses %}
+            <div class="status">
+                <p>{{ status.comment }}</p>
+                <small>{{ status.created_at }}</small>
+            </div>
+        {% empty %}
+            <p>Статусы отсутствуют</p>
+        {% endfor %}
+    </div>
+
+    <!-- Форма добавления статуса -->
+    <div class="add-status">
+        <h2>Добавить статус</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="comment">Комментарий:</label>
+            <textarea name="comment" id="comment" rows="4" required></textarea>
+            <br>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+
+    <form method="post" action="{% url 'work_with_appeal' appeal_id=appeal.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="close_appeal" value="true">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Отметить как завершенное</button>
+    </form>
+
+{% endblock %}

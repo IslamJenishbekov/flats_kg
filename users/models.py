@@ -24,6 +24,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     tg_link = models.CharField(max_length=255, blank=True, null=True)
     tel_number = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_blocked = models.BooleanField(default=False)
+    avatar_base64 = models.TextField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)  # Обязательное поле
     is_staff = models.BooleanField(default=False)  # Обязательное поле
