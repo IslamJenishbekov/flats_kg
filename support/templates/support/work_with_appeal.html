@@ -1,64 +1,163 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-    <h1>Обращение #{{ appeal.id }}</h1>
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl w-full bg-white p-8 rounded-lg shadow-lg space-y-8">
+            <h1 class="text-3xl font-bold text-center text-gray-900">Обращение #{{ appeal.id }}</h1>
 
-    <!-- Информация об обращении -->
-    <div class="appeal-info">
-        <p><strong>Текст:</strong> {{ appeal.text }}</p>
-        <p><strong>Создано:</strong> {{ appeal.created_at }}</p>
-        <p><strong>Последний ответ:</strong> {{ appeal.last_answered_at }}</p>
-        <p><strong>Статус:</strong> {% if appeal.closed %}Закрыто{% else %}Открыто{% endif %}</p>
-    </div>
-
-    <!-- Информация о пользователе -->
-    <div class="user-info">
-        <h2>Пользователь</h2>
-        <p><strong>Имя:</strong> {{ appeal.user.username }}</p>
-        {% if appeal.user.avatar_base64 %}
-            <img src="data:image/jpeg;base64,{{ appeal.user.avatar_base64 }}" alt="Аватар" width="100">
-        {% endif %}
-    </div>
-
-    <!-- Картинки -->
-    <div class="pictures">
-        <h2>Приложенные изображения</h2>
-        {% for picture in pictures %}
-            <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Изображение" width="200">
-        {% empty %}
-            <p>Изображения отсутствуют</p>
-        {% endfor %}
-    </div>
-
-    <!-- Статусы -->
-    <div class="statuses">
-        <h2>История статусов</h2>
-        {% for status in statuses %}
-            <div class="status">
-                <p>{{ status.comment }}</p>
-                <small>{{ status.created_at }}</small>
+            <div>
+                <h2 class="text-2xl font-semibold mb-4">Информация об обращении</h2>
+                <div class="space-y-2">
+                    <p><strong class="font-medium">Текст:</strong> {{ appeal.text }}</p>
+                    <p><strong class="font-medium">Создано:</strong> {{ appeal.created_at }}</p>
+                    <p><strong class="font-medium">Последний ответ:</strong> {{ appeal.last_answered_at }}</p>
+                    <p><strong class="font-medium">Статус:</strong> {% if appeal.closed %}Закрыто{% else %}Открыто{% endif %}</p>
+                </div>
             </div>
-        {% empty %}
-            <p>Статусы отсутствуют</p>
-        {% endfor %}
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4">Пользователь</h2>
+                <div class="flex items-center space-x-4">
+                    {% if appeal.user.avatar_base64 %}
+                        <img src="data:image/jpeg;base64,{{ appeal.user.avatar_base64 }}" alt="Аватар"
+                             class="w-16 h-16 rounded-full">
+                    {% endif %}
+                    <p><strong class="font-medium">Имя:</strong> {{ appeal.user.username }}</p>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4">Приложенные изображения</h2>
+                <div class="relative">
+                    <div class="carousel-container overflow-hidden rounded-lg h-[125px]">
+                        <div class="carousel-track flex transition-transform duration-500 ease-in-out">
+                            {% for picture in pictures %}
+                                <div class="carousel-slide min-w-full flex justify-center items-center">
+                                    <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления"
+                                         class="w-full object-cover cursor-zoom-in"
+                                         style="height: 500px;"
+                                         onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}')">
+                                </div>
+                            {% empty %}
+                                <p class="text-gray-600">Нет фотографий</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button class="carousel-prev absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+                        &larr;
+                    </button>
+                    <button class="carousel-next absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+                        &rarr;
+                    </button>
+                    <div class="flex mt-4 space-x-2 overflow-x-auto">
+                        {% for picture in pictures %}
+                            <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Миниатюра"
+                                 class="w-20 h-20 object-cover rounded-lg cursor-pointer"
+                                 onclick="goToSlide({{ forloop.counter0 }})">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4">История статусов</h2>
+                <div class="space-y-4">
+                    {% for status in statuses %}
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <p>{{ status.comment }}</p>
+                            <small class="text-gray-500">{{ status.created_at }}</small>
+                        </div>
+                    {% empty %}
+                        <p class="text-gray-500">Статусы отсутствуют</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4">Добавить статус</h2>
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label for="comment" class="block text-sm font-medium text-gray-700">Комментарий:</label>
+                        <textarea name="comment" id="comment" rows="4"
+                                  class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="Введите ваш комментарий..."></textarea>
+                    </div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-400 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Добавить
+                    </button>
+                </form>
+            </div>
+
+            <form method="post" action="{% url 'work_with_appeal' appeal_id=appeal.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="close_appeal" value="true">
+                <button type="submit"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Отметить как завершенное
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Форма добавления статуса -->
-    <div class="add-status">
-        <h2>Добавить статус</h2>
-        <form method="post">
-            {% csrf_token %}
-            <label for="comment">Комментарий:</label>
-            <textarea name="comment" id="comment" rows="4" required></textarea>
-            <br>
-            <button type="submit">Добавить</button>
-        </form>
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="relative">
+            <img id="modalImage" src="" alt="Увеличенное фото" class="max-w-full max-h-screen">
+            <button onclick="closeModal()"
+                    class="absolute top-4 right-4 text-white text-2xl bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75">
+                &times;
+            </button>
+        </div>
     </div>
 
-    <form method="post" action="{% url 'work_with_appeal' appeal_id=appeal.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="close_appeal" value="true">
-        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Отметить как завершенное</button>
-    </form>
+    <script>
+        const carouselTrack = document.querySelector('.carousel-track');
+        const carouselSlides = document.querySelectorAll('.carousel-slide');
+        const prevButton = document.querySelector('.carousel-prev');
+        const nextButton = document.querySelector('.carousel-next');
+        const thumbnails = document.querySelectorAll('.carousel-thumbnail');
 
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            const offset = -currentIndex * 100;
+            carouselTrack.style.transform = `translateX(${offset}%)`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = carouselSlides.length - 1;
+            }
+            updateCarousel();
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < carouselSlides.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateCarousel();
+        });
+
+        function goToSlide(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+        }
+    </script>
 {% endblock %}
