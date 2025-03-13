@@ -11,13 +11,13 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-11 gap-8">
-                <div class="relative col-span-4">
-                    <div class="carousel-container overflow-hidden rounded-lg  h-[200px]">
+                <div class="relative col-span-5">
+                    <div class="carousel-container overflow-hidden rounded-lg h-[200px]">
                         <div class="carousel-track flex transition-transform duration-500 ease-in-out">
                             {% for picture in pictures %}
                                 <div class="carousel-slide min-w-full">
                                     <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления"
-                                         class="rounded-lg cursor-zoom-in"
+                                         class="w-full h-96 object-cover rounded-lg cursor-zoom-in"
                                          onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}')">
                                 </div>
                             {% empty %}
@@ -40,7 +40,8 @@
                     </div>
                 </div>
 
-                <div class="space-y-6 col-span-7">
+
+                <div class="space-y-6 col-span-6">
                     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
                         <div class="flex justify-between items-center">
                             <div>
