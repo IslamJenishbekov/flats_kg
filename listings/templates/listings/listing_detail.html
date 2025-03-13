@@ -18,6 +18,7 @@
                                 <div class="carousel-slide min-w-full">
                                     <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления"
                                          class="w-full h-96 object-cover rounded-lg cursor-zoom-in"
+                                         style="height: 30rem"
                                          onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}')">
                                 </div>
                             {% empty %}
@@ -45,7 +46,7 @@
                     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
                         <div class="flex justify-between items-center">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">{{ listing.price }} $</h1>
+                                <h1 class="text-3xl font-bold text-green-600">{{ listing.price }} $</h1>
                             </div>
                             {% if request.user.is_authenticated and request.user.id != listing.user.id %}
                                 <form id="likeForm" method="post" action="{% url 'listing_detail' listing.id %}">
@@ -62,7 +63,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="bg-gray-50 p-6 rounded-lg mb-8">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4">Основные характеристики</h2>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center space-x-3">
@@ -131,6 +132,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="bg-gray-50 p-6 rounded-lg mb-8">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Цена предсказанная нашей моделью</h2>
+                            <p class="text-3xl font-bold text-green-600">{{ predicted_price }} $</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
