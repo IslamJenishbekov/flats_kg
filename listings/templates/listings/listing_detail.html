@@ -11,13 +11,14 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-11 gap-8">
-                <div class="relative col-span-4">
-                    <div class="carousel-container overflow-hidden rounded-lg  h-[200px]">
+                <div class="relative col-span-5">
+                    <div class="carousel-container overflow-hidden rounded-lg h-[200px]">
                         <div class="carousel-track flex transition-transform duration-500 ease-in-out">
                             {% for picture in pictures %}
                                 <div class="carousel-slide min-w-full">
                                     <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Фото объявления"
-                                         class="rounded-lg cursor-zoom-in"
+                                         class="w-full h-96 object-cover rounded-lg cursor-zoom-in"
+                                         style="height: 30rem"
                                          onclick="openModal('data:image/jpeg;base64,{{ picture.image_base64 }}')">
                                 </div>
                             {% empty %}
@@ -40,11 +41,12 @@
                     </div>
                 </div>
 
-                <div class="space-y-6 col-span-7">
+
+                <div class="space-y-6 col-span-6">
                     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
                         <div class="flex justify-between items-center">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">{{ listing.price }} $</h1>
+                                <h1 class="text-3xl font-bold text-green-600">{{ listing.price }} $</h1>
                             </div>
                             {% if request.user.is_authenticated and request.user.id != listing.user.id %}
                                 <form id="likeForm" method="post" action="{% url 'listing_detail' listing.id %}">
@@ -61,7 +63,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="bg-gray-50 p-6 rounded-lg mb-8">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4">Основные характеристики</h2>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex items-center space-x-3">
@@ -130,6 +132,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="bg-gray-50 p-6 rounded-lg mb-8">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Цена предсказанная нашей моделью</h2>
+                            <p class="text-3xl font-bold text-green-600">{{ predicted_price }} $</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -148,33 +157,63 @@
 
             {% if user.role == "moderator" %}
                 <div class="mt-8 bg-gray-50 p-6 rounded-lg">
-                    <form method="post" action="{% url 'listing_detail' listing.id %}" id="blockForm">
-                        {% csrf_token %}
+                    <button type="button" onclick="openBlockModal()"
+                            class="w-full bg-red-400 text-white font-semibold py-3 rounded-lg hover:bg-red-500 transition duration-300">
+                        Заблокировать объявление
+                    </button>
+                </div>
 
-                        <!-- Скрытые поля -->
-                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
-                        <input type="hidden" name="reason" id="blockReasonInput">
+                <div id="blockModal"
+                     class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+                    <div class="bg-white p-8 rounded-lg w-11/12 max-w-md">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Блокировка объявления</h2>
+                        <form method="post" action="{% url 'listing_detail' listing.id %}" id="blockForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            <input type="hidden" name="reason" id="blockReasonInput">
 
-                        <!-- Кнопка заблокировать с подтверждением -->
-                        <button type="button" onclick="submitBlockForm()"
-                                class="w-full bg-red-400 text-white font-semibold py-3 rounded-lg hover:bg-red-500 transition duration-300">
-                            Заблокировать объявление
-                        </button>
-                    </form>
+                            <div class="mb-4">
+                                <label for="reasonText" class="block text-sm font-medium text-gray-700">Причина
+                                    блокировки:</label>
+                                <textarea id="reasonText" rows="4"
+                                          class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                          placeholder="Введите причину блокировки..."></textarea>
+                            </div>
+
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" onclick="closeBlockModal()"
+                                        class="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-300">
+                                    Отмена
+                                </button>
+                                <button type="submit"
+                                        class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300">
+                                    Заблокировать
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <script>
-                    function submitBlockForm() {
-                        let reason = prompt("Введите причину блокировки:");
-                        if (reason && reason.trim() !== "") {
-                            // Устанавливаем значение в скрытое поле
-                            document.getElementById("blockReasonInput").value = reason.trim();
-                            // Отправляем форму
-                            document.getElementById("blockForm").submit();
-                        } else {
-                            alert("Причина блокировки обязательна!");
-                        }
+                    function openBlockModal() {
+                        const modal = document.getElementById('blockModal');
+                        modal.classList.remove('hidden');
                     }
+
+                    function closeBlockModal() {
+                        const modal = document.getElementById('blockModal');
+                        modal.classList.add('hidden');
+                    }
+
+                    document.getElementById('blockForm').addEventListener('submit', function (event) {
+                        const reasonText = document.getElementById('reasonText').value.trim();
+                        if (!reasonText) {
+                            event.preventDefault();
+                            alert('Причина блокировки обязательна!');
+                        } else {
+                            document.getElementById('blockReasonInput').value = reasonText;
+                        }
+                    });
                 </script>
             {% endif %}
 
