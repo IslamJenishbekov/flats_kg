@@ -47,19 +47,21 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <button class="carousel-prev absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
-                        &larr;
-                    </button>
-                    <button class="carousel-next absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
-                        &rarr;
-                    </button>
-                    <div class="flex mt-4 space-x-2 overflow-x-auto">
-                        {% for picture in pictures %}
-                            <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Миниатюра"
-                                 class="w-20 h-20 object-cover rounded-lg cursor-pointer"
-                                 onclick="goToSlide({{ forloop.counter0 }})">
-                        {% endfor %}
-                    </div>
+                    {% if pictures %}
+                        <button class="carousel-prev absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+                            &larr;
+                        </button>
+                        <button class="carousel-next absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
+                            &rarr;
+                        </button>
+                        <div class="flex mt-4 space-x-2 overflow-x-auto">
+                            {% for picture in pictures %}
+                                <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Миниатюра"
+                                     class="w-20 h-20 object-cover rounded-lg cursor-pointer"
+                                     onclick="goToSlide({{ forloop.counter0 }})">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
