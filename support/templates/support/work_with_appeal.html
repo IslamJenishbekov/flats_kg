@@ -11,19 +11,23 @@
                     <p><strong class="font-medium">Текст:</strong> {{ appeal.text }}</p>
                     <p><strong class="font-medium">Создано:</strong> {{ appeal.created_at }}</p>
                     <p><strong class="font-medium">Последний ответ:</strong> {{ appeal.last_answered_at }}</p>
-                    <p><strong class="font-medium">Статус:</strong> {% if appeal.closed %}Закрыто{% else %}Открыто{% endif %}</p>
+                    <p><strong class="font-medium">Статус:</strong> {% if appeal.closed %}Закрыто{% else %}
+                        Открыто{% endif %}</p>
                 </div>
             </div>
 
             <div>
                 <h2 class="text-2xl font-semibold mb-4">Пользователь</h2>
-                <div class="flex items-center space-x-4">
-                    {% if appeal.user.avatar_base64 %}
-                        <img src="data:image/jpeg;base64,{{ appeal.user.avatar_base64 }}" alt="Аватар"
-                             class="w-16 h-16 rounded-full">
-                    {% endif %}
-                    <p><strong class="font-medium">Имя:</strong> {{ appeal.user.username }}</p>
-                </div>
+                <a href="{% url 'users:another_profile' appeal.user.id %}">
+
+                    <div class="flex items-center space-x-4">
+                        {% if appeal.user.avatar_base64 %}
+                            <img src="data:image/jpeg;base64,{{ appeal.user.avatar_base64 }}" alt="Аватар"
+                                 class="w-16 h-16 rounded-full">
+                        {% endif %}
+                        <p><strong class="font-medium">Имя:</strong> {{ appeal.user.username }}</p>
+                    </div>
+                </a>
             </div>
 
             <div>
