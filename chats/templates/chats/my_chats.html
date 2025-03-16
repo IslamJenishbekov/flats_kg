@@ -1,0 +1,20 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+
+    <h1>Мои чаты</h1>
+    <div class="chat-list">
+        {% for chat in chat_list %}
+            <div class="chat-item {% if chat.unread_count > 0 %}unread{% endif %}">
+                <a href="{% url 'chat_room' room_id=chat.room.id %}">
+                    Чат с {{ chat.other_user.username }}
+                </a>
+                {% if chat.unread_count > 0 %}
+                    <span class="unread-count">{{ chat.unread_count }}</span>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>У вас пока нет чатов.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

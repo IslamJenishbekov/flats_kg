@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'chats',
     'common',
     'support',
-    'moderation'
+    'moderation',
 ]
 
 MIDDLEWARE = [

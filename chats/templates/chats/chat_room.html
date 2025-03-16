@@ -1,0 +1,82 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+
+    <h1>Чат</h1>
+    <div id="chat-log">
+        {% for message in messages %}
+            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <strong>{{ message.sender.username }}:</strong> {{ message.content }}
+                <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    <input type="text" id="message-input" placeholder="Введите сообщение">
+    <button onclick="sendMessage()">Отправить</button>
+
+    <script>
+        var roomId = {{ chat_room.id }};
+        var currentUser = "{{ request.user.username }}";
+        var lastMessageId = 0; // Начальный ID последнего сообщения
+        var csrfToken = "{{ csrf_token }}"; // Сохраняем CSRF-токен в переменную
+
+        // Функция для получения новых сообщений
+        function getNewMessages() {
+            fetch(`/chats/get_new_messages/${roomId}/?last_message_id=${lastMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        const chatLog = document.getElementById('chat-log');
+                        data.messages.forEach(msg => {
+                            const messageClass = (msg.sender === currentUser) ? 'sent' : 'received';
+                            const messageHtml = `
+                                <div class="message ${messageClass}">
+                                    <strong>${msg.sender}:</strong> ${msg.content}
+                                    <span class="timestamp">${msg.timestamp}</span>
+                                </div>
+                            `;
+                            chatLog.innerHTML += messageHtml;
+                            lastMessageId = msg.id; // Обновляем ID последнего сообщения
+                        });
+                        chatLog.scrollTop = chatLog.scrollHeight; // Прокручиваем вниз
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        }
+
+        // Периодический опрос каждые 5 секунд
+        setInterval(getNewMessages, 5000);
+
+        // Функция отправки сообщения
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            if (message !== '') {
+                fetch(`/chats/send_message/${roomId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken // Используем переменную с CSRF-токеном
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messageInput.value = ''; // Очищаем поле ввода
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+            }
+        }
+
+        // Отправка сообщения по нажатию Enter
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('message-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+{% endblock %}
