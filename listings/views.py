@@ -199,6 +199,7 @@ def listing_chat_view(request):
             'developer': listing_details.developer,
             'region': listing_details.region,
             'city': listing_details.city,
+            'description': listing_details.description
         }
 
         response = listing_chat.get_response(message, flat_data)
