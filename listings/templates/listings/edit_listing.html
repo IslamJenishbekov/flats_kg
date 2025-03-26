@@ -1,0 +1,253 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <div class="flex flex-col flex-grow justify-center bg-gray-50 py-8">
+        <div class="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
+            <h2 class="text-2xl font-semibold text-center mb-6">Редактировать объявление</h2>
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-6" id="edit-listing-form">
+                {% csrf_token %}
+                <div>
+                    <label for="listing_type" class="block text-sm font-medium text-gray-700">Тип объявления:</label>
+                    <select name="listing_type" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите тип объявления</option>
+                        {% for value in listing_types %}
+                            <option value="{{ value }}" {% if value == listing_detail.listing_type %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="apartment_series" class="block text-sm font-medium text-gray-700">Серия квартиры:</label>
+                    <select name="apartment_series" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите серию</option>
+                        {% for value in apartment_series %}
+                            <option value="{{ value }}" {% if value == listing_detail.apartment_series %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="heating" class="block text-sm font-medium text-gray-700">Отопление:</label>
+                    <select name="heating" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите тип отопления</option>
+                        {% for value in heating_options %}
+                            <option value="{{ value }}" {% if value == listing_detail.heating %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="condition" class="block text-sm font-medium text-gray-700">Состояние:</label>
+                    <select name="condition" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите состояние</option>
+                        {% for value in conditions %}
+                            <option value="{{ value }}" {% if value == listing_detail.condition %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="furniture" class="block text-sm font-medium text-gray-700">Мебель:</label>
+                    <select name="furniture" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите мебель</option>
+                        {% for value in furniture_options %}
+                            <option value="{{ value }}" {% if value == listing_detail.furniture %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="rooms" class="block text-sm font-medium text-gray-700">Количество комнат:</label>
+                    <select name="rooms" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите количество комнат</option>
+                        {% for value in room_options %}
+                            <option value="{{ value }}" {% if value == listing.rooms %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="area" class="block text-sm font-medium text-gray-700">Площадь:</label>
+                    <input type="number" step="0.1" name="area" required
+                           value="{{ listing_detail.area }}"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label for="floor" class="block text-sm font-medium text-gray-700">Этаж:</label>
+                    <input type="number" name="floor" required
+                           value="{{ listing_detail.floor }}"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label for="total_floors" class="block text-sm font-medium text-gray-700">Всего этажей:</label>
+                    <input type="number" name="total_floors" required
+                           value="{{ listing_detail.total_floors }}"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label for="year_built" class="block text-sm font-medium text-gray-700">Год постройки:</label>
+                    <input type="number" name="year_built" required
+                           value="{{ listing_detail.year_built }}"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label for="wall_material" class="block text-sm font-medium text-gray-700">Тип дома:</label>
+                    <select name="wall_material" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите тип дома</option>
+                        {% for value in wall_material_options %}
+                            <option value="{{ value }}" {% if value == listing_detail.wall_material %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="region" class="block text-sm font-medium text-gray-700">Область:</label>
+                    <select name="region" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите область</option>
+                        {% for value in region_options %}
+                            <option value="{{ value }}" {% if value == listing_detail.region %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700">Город или село:</label>
+                    <select name="city" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите город</option>
+                        {% for value in city_options %}
+                            <option value="{{ value }}" {% if value == listing_detail.city %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Точный адрес:</label>
+                    <input type="text" name="address" id="address" required
+                           value="{{ listing.address }}"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                           placeholder="Введите адрес">
+                </div>
+
+                <div>
+                    <label for="developer" class="block text-sm font-medium text-gray-700">Застройщик:</label>
+                    <select name="developer" required
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                        <option value="" disabled>Выберите застройщика</option>
+                        {% for value in developers %}
+                            <option value="{{ value }}" {% if value == listing_detail.developer %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Описание:</label>
+                    <textarea name="description" required
+                              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">{{ listing_detail.description }}</textarea>
+                </div>
+
+                <div>
+                    <label for="pictures" class="block text-sm font-medium text-gray-700">Фотографии:</label>
+                    <div class="mt-2 mb-4 flex flex-wrap gap-2">
+                        {% for picture in pictures %}
+                            <div class="relative w-24 h-24 rounded-lg overflow-hidden shadow-md">
+                                <img src="data:image/jpeg;base64,{{ picture.image_base64 }}" alt="Listing picture"
+                                     class="w-full h-full object-cover">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-1 relative">
+                        <input type="file" name="pictures" multiple accept=".png, .jpg, .jpeg" id="pictures"
+                               class="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                               onchange="updateFileList()">
+                        <div class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 flex items-center justify-between">
+                            <span id="file-list">Добавить новые фото</span>
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="selected-files" class="mt-2 flex flex-wrap gap-2"></div>
+                </div>
+
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Цена ($):</label>
+                    <input type="number" name="price" required min="0" step="0.01"
+                           value="{{ listing.price }}"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function updateFileList() {
+            const input = document.getElementById('pictures');
+            const fileList = document.getElementById('file-list');
+            const selectedFiles = document.getElementById('selected-files');
+            const files = input.files;
+
+            if (files.length > 0) {
+                fileList.textContent = `Выбрано новых файлов: ${files.length}`;
+                selectedFiles.innerHTML = '';
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'relative w-24 h-24 rounded-lg overflow-hidden shadow-md';
+
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.alt = file.name;
+                    img.className = 'w-full h-full object-cover';
+
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = '×';
+                    removeButton.className = 'absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600';
+                    removeButton.onclick = () => removeFile(i);
+                    fileItem.appendChild(removeButton);
+
+                    fileItem.appendChild(img);
+                    selectedFiles.appendChild(fileItem);
+                }
+            } else {
+                fileList.textContent = 'Добавить новые фото';
+                selectedFiles.innerHTML = '';
+            }
+        }
+
+        function removeFile(index) {
+            const input = document.getElementById('pictures');
+            const files = Array.from(input.files);
+            files.splice(index, 1);
+
+            const dataTransfer = new DataTransfer();
+            files.forEach(file => dataTransfer.items.add(file));
+
+            input.files = dataTransfer.files;
+            updateFileList();
+        }
+    </script>
+{% endblock %}

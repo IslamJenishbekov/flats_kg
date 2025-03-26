@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from listings.models import *
 from moderation.models import Blocking
 from django.http import JsonResponse
@@ -9,6 +10,7 @@ import base64
 from io import BytesIO
 from .services import get_predicted_price, main_chat, listing_chat
 from django.contrib import messages
+import io
 
 
 def show_all_listings(request):
@@ -217,3 +219,67 @@ def show_my_favorites(request):
         for listing in favorite_listings
     ]
     return render(request, 'listings/my_favorite_listings.html', {'listings_with_pictures': listings_with_pictures})
+
+
+def edit_listing(request, listing_id):
+    listing = get_object_or_404(Listing, id=listing_id, user=request.user)
+    listing_detail = listing.details
+
+    if request.method == 'POST':
+        # Обновляем основные поля Listing
+        listing.rooms = request.POST.get('rooms')
+        listing.price = request.POST.get('price')
+        listing.address = request.POST.get('address')
+        listing.save()
+
+        # Обновляем поля ListingDetail
+        listing_detail.listing_type = request.POST.get('listing_type')
+        listing_detail.apartment_series = request.POST.get('apartment_series')
+        listing_detail.heating = request.POST.get('heating')
+        listing_detail.condition = request.POST.get('condition')
+        listing_detail.furniture = request.POST.get('furniture')
+        listing_detail.area = request.POST.get('area')
+        listing_detail.floor = request.POST.get('floor')
+        listing_detail.total_floors = request.POST.get('total_floors')
+        listing_detail.year_built = request.POST.get('year_built')
+        listing_detail.wall_material = request.POST.get('wall_material')
+        listing_detail.developer = request.POST.get('developer')
+        listing_detail.description = request.POST.get('description')
+        listing_detail.region = request.POST.get('region')
+        listing_detail.city = request.POST.get('city')
+        listing_detail.save()
+
+        # Обработка новых картинок
+        if 'pictures' in request.FILES:
+            for file in request.FILES.getlist('pictures'):
+                # Конвертируем файл в base64
+                buffered = io.BytesIO()
+                file.save(buffered)
+                encoded_string = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+                ListingPicture.objects.create(
+                    listing=listing,
+                    image_base64=encoded_string
+                )
+
+        return redirect('listing_detail', listing_id=listing.id)  # Перенаправление после сохранения
+
+    with open("possible_fields.json", 'r') as file:
+        context = json.load(file)
+    context["pictures"] = listing.pictures.all()
+    context["listing_detail"] = listing_detail
+    context["listing"] = listing
+
+    return render(request, 'listings/edit_listing.html', context)
+
+
+def delete_listing(request, listing_id):
+    listing = get_object_or_404(Listing, id=listing_id, user=request.user)
+
+    if request.method == 'POST':
+        listing.delete()
+        messages.success(request, 'Объявление успешно удалено')
+        return redirect('my_listings')
+
+    return redirect("my_listings")
+
