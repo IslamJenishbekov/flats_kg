@@ -25,8 +25,11 @@ def show_all_listings(request):
         }
         for listing in listings
     ]
-    with open('possible_fields.json', 'r') as file:
+    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
+
+    with open(json_path, 'r', encoding='utf-8') as file:
         filter_values = json.load(file)
+
     return render(request, 'listings/all_listings.html', {'listings_with_pictures': listings_with_pictures,
                                                           'filter_values': filter_values})
 
@@ -284,8 +287,11 @@ def edit_listing(request, listing_id):
 
         return redirect('listing_detail', listing_id=listing.id)  # Перенаправление после сохранения
 
-    with open("possible_fields.json", 'r') as file:
+    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
+
+    with open(json_path, 'r', encoding='utf-8') as file:
         context = json.load(file)
+
     context["pictures"] = listing.pictures.all()
     context["listing_detail"] = listing_detail
     context["listing"] = listing
