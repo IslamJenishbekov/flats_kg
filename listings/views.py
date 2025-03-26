@@ -25,7 +25,10 @@ def show_all_listings(request):
         }
         for listing in listings
     ]
-    return render(request, 'listings/all_listings.html', {'listings_with_pictures': listings_with_pictures})
+    with open('possible_fields.json', 'r') as file:
+        filter_values = json.load(file)
+    return render(request, 'listings/all_listings.html', {'listings_with_pictures': listings_with_pictures,
+                                                          'filter_values': filter_values})
 
 
 def create_listing(request):
