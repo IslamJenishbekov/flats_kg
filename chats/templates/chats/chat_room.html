@@ -1,82 +1,145 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-
-    <h1>Чат</h1>
-    <div id="chat-log">
-        {% for message in messages %}
-            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
-                <strong>{{ message.sender.username }}:</strong> {{ message.content }}
-                <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
+    <div class="max-w-3xl mx-auto p-4">
+        <div class="flex items-center space-x-3 pb-4 mb-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
+                {% if chat_room.user2 == request.user %}
+                    {% if chat_room.user1.profile.avatar_base64 %}
+                        <img src="data:image/jpeg;base64,{{ chat_room.user1.profile.avatar_base64 }}"
+                             alt="{{ chat_room.user1.username }}"
+                             class="w-full h-full object-cover">
+                    {% else %}
+                        <img src="https://static.vecteezy.com/system/resources/previews/036/594/092/large_2x/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg"
+                             alt="{{ chat_room.user1.username }}"
+                             class="w-full h-full object-cover">
+                    {% endif %}
+                {% else %}
+                    {% if chat_room.user2.profile.avatar_base64 %}
+                        <img src="data:image/jpeg;base64,{{ chat_room.user2.profile.avatar_base64 }}"
+                             alt="{{ chat_room.user2.username }}"
+                             class="w-full h-full object-cover">
+                    {% else %}
+                        <img src="https://static.vecteezy.com/system/resources/previews/036/594/092/large_2x/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg"
+                             alt="{{ chat_room.user2.username }}"
+                             class="w-full h-full object-cover">
+                    {% endif %}
+                {% endif %}
             </div>
-        {% endfor %}
+            <h1 class="text-xl font-semibold text-gray-800">
+                {% if chat_room.user2 == request.user %}
+                    {{ chat_room.user1.username }}
+                {% else %}
+                    {{ chat_room.user2.username }}
+                {% endif %}
+            </h1>
+        </div>
+
+        <div id="chat-log"
+             class="h-96 overflow-y-auto space-y-4 mb-4 p-2 border border-gray-200 rounded-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            {% for message in messages %}
+                <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
+                    <div class="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl w-fit rounded-lg px-4 py-2 {% if message.sender == request.user %}bg-blue-500 text-white{% else %}bg-gray-200 text-gray-800{% endif %} break-words">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold">{{ message.sender.username }}</span>
+                            <span class="text-xs opacity-80 ml-2">{{ message.timestamp|date:"H:i" }}</span>
+                        </div>
+                        <p class="whitespace-pre-wrap overflow-wrap-anywhere">{{ message.content }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="border-t border-gray-200 pt-4">
+            <div class="flex space-x-2">
+                <input type="text" id="message-input" placeholder="Введите сообщение..."
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-pre-wrap">
+                <button onclick="sendMessage()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                              clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
-    <input type="text" id="message-input" placeholder="Введите сообщение">
-    <button onclick="sendMessage()">Отправить</button>
 
     <script>
-        var roomId = {{ chat_room.id }};
-        var currentUser = "{{ request.user.username }}";
-        var lastMessageId = 0; // Начальный ID последнего сообщения
-        var csrfToken = "{{ csrf_token }}"; // Сохраняем CSRF-токен в переменную
+        const roomId = {{ chat_room.id }};
+        const currentUser = "{{ request.user.username }}";
+        let lastMessageId = {% if messages %}{{ messages.last.id }}{% else %}0{% endif %};
+        const csrfToken = "{{ csrf_token }}";
 
-        // Функция для получения новых сообщений
-        function getNewMessages() {
-            fetch(`/chats/get_new_messages/${roomId}/?last_message_id=${lastMessageId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.messages && data.messages.length > 0) {
-                        const chatLog = document.getElementById('chat-log');
-                        data.messages.forEach(msg => {
-                            const messageClass = (msg.sender === currentUser) ? 'sent' : 'received';
-                            const messageHtml = `
-                                <div class="message ${messageClass}">
-                                    <strong>${msg.sender}:</strong> ${msg.content}
-                                    <span class="timestamp">${msg.timestamp}</span>
-                                </div>
-                            `;
-                            chatLog.innerHTML += messageHtml;
-                            lastMessageId = msg.id; // Обновляем ID последнего сообщения
-                        });
-                        chatLog.scrollTop = chatLog.scrollHeight; // Прокручиваем вниз
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-        }
-
-        // Периодический опрос каждые 5 секунд
-        setInterval(getNewMessages, 5000);
-
-        // Функция отправки сообщения
-        function sendMessage() {
-            const messageInput = document.getElementById('message-input');
-            const message = messageInput.value.trim();
-            if (message !== '') {
-                fetch(`/chats/send_message/${roomId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken // Используем переменную с CSRF-токеном
-                    },
-                    body: JSON.stringify({ message: message })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        messageInput.value = ''; // Очищаем поле ввода
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-            }
-        }
-
-        // Отправка сообщения по нажатию Enter
         document.addEventListener('DOMContentLoaded', () => {
+            const chatLog = document.getElementById('chat-log');
+            chatLog.scrollTop = chatLog.scrollHeight;
+
             document.getElementById('message-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
                     sendMessage();
                 }
             });
         });
+
+        async function getNewMessages() {
+            try {
+                const response = await fetch(`/chats/get_new_messages/${roomId}/?last_message_id=${lastMessageId}`);
+                const data = await response.json();
+
+                if (data.messages?.length > 0) {
+                    const chatLog = document.getElementById('chat-log');
+                    data.messages.forEach(msg => {
+                        const isCurrentUser = msg.sender === currentUser;
+                        const messageHtml = `
+                        <div class="flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
+                            <div class="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl w-fit rounded-lg px-4 py-2 ${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} break-words">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-semibold">${msg.sender}</span>
+                                    <span class="text-xs opacity-80 ml-2">${msg.timestamp}</span>
+                                </div>
+                                <p class="whitespace-pre-wrap">${msg.content}</p>
+                            </div>
+                        </div>
+                        `;
+                        chatLog.innerHTML += messageHtml;
+                        lastMessageId = msg.id;
+                    });
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Ошибка получения сообщений:', error);
+            }
+        }
+
+        async function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+
+            if (message === '') return;
+
+            try {
+                const response = await fetch(`/chats/send_message/${roomId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({message})
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    messageInput.value = '';
+                    await getNewMessages();
+                }
+            } catch (error) {
+                console.error('Ошибка отправки сообщения:', error);
+            }
+        }
+
+        setInterval(getNewMessages, 3000);
     </script>
 {% endblock %}
