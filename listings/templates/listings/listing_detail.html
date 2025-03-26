@@ -217,6 +217,22 @@
                 </script>
             {% endif %}
 
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Оставить комментарий</h2>
+                {% if user.is_authenticated %}
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
+                        {{ comment_form.as_p }}
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            Отправить
+                        </button>
+                    </form>
+                {% else %}
+                    <p class="text-gray-600">Вы должны <a href="{% url 'login' %}" class="text-blue-500">войти</a>,
+                        чтобы оставить комментарий.</p>
+                {% endif %}
+            </div>
+
             <div class="mt-8 bg-gray-50 p-6 rounded-lg">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">Комментарии</h2>
                 <div class="space-y-4">
@@ -224,6 +240,13 @@
                         <div class="bg-white p-4 rounded-lg shadow-sm">
                             <p class="text-sm font-medium text-gray-600">{{ comment.user.username }}</p>
                             <p class="text-lg font-semibold text-gray-900">{{ comment.comment }}</p>
+                            {% if comment.user == request.user %}
+                                <div class="mt-2 space-x-4">
+                                    <a href="{% url 'edit_comment' comment.id %}" class="text-blue-500 hover:underline">Редактировать</a>
+                                    <a href="{% url 'delete_comment' comment.id %}"
+                                       class="text-red-500 hover:underline">Удалить</a>
+                                </div>
+                            {% endif %}
                         </div>
                     {% empty %}
                         <p class="text-gray-600">Комментариев пока нет</p>

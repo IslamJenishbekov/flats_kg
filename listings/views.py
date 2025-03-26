@@ -1,4 +1,6 @@
 import json
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -11,6 +13,7 @@ from io import BytesIO
 from .services import get_predicted_price, main_chat, listing_chat
 from django.contrib import messages
 import io
+from listings.comment_form import CommentForm
 
 
 def show_all_listings(request):
@@ -129,6 +132,18 @@ def show_listing_detail(request, listing_id):
                 favorite.save()
             listing_details.save()
 
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect('login')  # Redirect to login if not authenticated
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            listing = get_object_or_404(Listing, id=listing_id)
+            comment.listing = listing
+            comment.user = request.user
+            comment.save()
+            return redirect('listing_detail', listing_id=listing_id)
+
     listing = get_object_or_404(Listing, id=listing_id)
     listing_details = listing.details  # Получаем связанные детали объявления
     comments = listing.comments.all().order_by('-created_at')  # Все комментарии, сортированные по дате
@@ -153,12 +168,14 @@ def show_listing_detail(request, listing_id):
     }
 
     predicted_price = get_predicted_price.get_predicted_price(flat_data)
+    comment_form = CommentForm()
     context = {
         'listing': listing,
         'listing_details': listing_details,
         'comments': comments,
         'pictures': pictures,
-        'predicted_price': predicted_price
+        'predicted_price': predicted_price,
+        'comment_form': comment_form,
     }
 
     return render(request, 'listings/listing_detail.html', context)
@@ -283,3 +300,33 @@ def delete_listing(request, listing_id):
 
     return redirect("my_listings")
 
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(ListingComment, id=comment_id)
+    if comment.user != request.user:
+        return redirect('listing_detail', listing_id=comment.listing.id)  # Only owner can edit
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('listing_detail', listing_id=comment.listing.id)
+    else:
+        form = CommentForm(instance=comment)
+
+    return render(request, 'listings/edit_comment.html', {'form': form, 'comment': comment})
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(ListingComment, id=comment_id)
+    if comment.user != request.user:
+        return redirect('listing_detail', listing_id=comment.listing.id)  # Only owner can delete
+
+    if request.method == 'POST':
+        listing_id = comment.listing.id
+        comment.delete()
+        return redirect('listing_detail', listing_id=listing_id)
+    else:
+        return render(request, 'listings/delete_comment.html', {'comment': comment})

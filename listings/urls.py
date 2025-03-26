@@ -15,5 +15,7 @@ urlpatterns = [
                   path('users/', include('users.urls')),
                   path('my_favorites/', views.show_my_favorites, name='my_favorites'),
                   path('edit_<int:listing_id>/', views.edit_listing, name='edit_listing'),
-                  path('delete_<int:listing_id>/', views.delete_listing, name='delete_listing')
+                  path('delete_<int:listing_id>/', views.delete_listing, name='delete_listing'),
+                  path('comments/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+                  path('comments/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
