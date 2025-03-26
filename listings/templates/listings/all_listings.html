@@ -6,78 +6,179 @@
 
 
         <div class="filters bg-gray-50 p-6 rounded-lg shadow-md mb-6 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Тип недвижимости</label>
-                    <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                        <option>Квартира</option>
-                        <option>Дом</option>
-                        <option>Комната</option>
-                    </select>
-                </div>
+            <form method="GET" action="{% url 'all_listings' %}">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Тип объявления</label>
+                        <select name="listing_type"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Все</option>
+                            {% for type in filter_values.listing_types %}
+                                <option value="{{ type }}"
+                                        {% if request.GET.listing_type == type %}selected{% endif %}>{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Кол-во комнат</label>
-                    <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4+</option>
-                    </select>
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Серия дома</label>
+                        <select name="apartment_series"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любая</option>
+                            {% for series in filter_values.apartment_series %}
+                                <option value="{{ series }}"
+                                        {% if request.GET.apartment_series == series %}selected{% endif %}>{{ series }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Регион</label>
-                    <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                        <option>Любой</option>
-                        <option>Бишкек</option>
-                        <option>Ош</option>
-                    </select>
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Кол-во комнат</label>
+                        <select name="rooms" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любое</option>
+                            {% for room in filter_values.room_options %}
+                                <option value="{{ room }}"
+                                        {% if request.GET.rooms == room %}selected{% endif %}>{{ room }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Цена</label>
-                    <div class="flex gap-2">
-                        <input type="number" placeholder="От"
-                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                        <input type="number" placeholder="До"
-                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Отопление</label>
+                        <select name="heating"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любое</option>
+                            {% for heating in filter_values.heating_options %}
+                                <option value="{{ heating }}"
+                                        {% if request.GET.heating == heating %}selected{% endif %}>{{ heating }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Состояние</label>
+                        <select name="condition"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любое</option>
+                            {% for condition in filter_values.conditions %}
+                                <option value="{{ condition }}"
+                                        {% if request.GET.condition == condition %}selected{% endif %}>{{ condition }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Мебель</label>
+                        <select name="furniture"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любое</option>
+                            {% for furniture in filter_values.furniture_options %}
+                                <option value="{{ furniture }}"
+                                        {% if request.GET.furniture == furniture %}selected{% endif %}>{{ furniture }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Регион</label>
+                        <select name="region" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любой</option>
+                            {% for region in filter_values.region_options %}
+                                <option value="{{ region }}"
+                                        {% if request.GET.region == region %}selected{% endif %}>{{ region }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Город</label>
+                        <select name="city" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любой</option>
+                            {% for city in filter_values.city_options %}
+                                <option value="{{ city }}"
+                                        {% if request.GET.city == city %}selected{% endif %}>{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Застройщик</label>
+                        <select name="developer"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любой</option>
+                            {% for developer in filter_values.developers %}
+                                <option value="{{ developer }}"
+                                        {% if request.GET.developer == developer %}selected{% endif %}>{{ developer }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Тип дома</label>
+                        <select name="wall_material"
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="">Любой</option>
+                            {% for material in filter_values.wall_material_options %}
+                                <option value="{{ material }}"
+                                        {% if request.GET.wall_material == material %}selected{% endif %}>{{ material }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Цена ($)</label>
+                        <div class="flex gap-2">
+                            <input type="number" name="price_min" placeholder="От" value="{{ request.GET.price_min }}"
+                                   class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <input type="number" name="price_max" placeholder="До" value="{{ request.GET.price_max }}"
+                                   class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Площадь (м²)</label>
+                        <div class="flex gap-2">
+                            <input type="number" name="area_min" placeholder="От" value="{{ request.GET.area_min }}"
+                                   class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <input type="number" name="area_max" placeholder="До" value="{{ request.GET.area_max }}"
+                                   class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Этаж</label>
+                        <div class="flex gap-2">
+                            <input type="number" name="floor_min" placeholder="От" value="{{ request.GET.floor_min }}"
+                                   class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                            <input type="number" name="floor_max" placeholder="До" value="{{ request.GET.floor_max }}"
+                                   class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Дополнительно</label>
+                        <div class="mt-1 space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="has_photo" class="form-checkbox"
+                                       {% if request.GET.has_photo %}checked{% endif %}>
+                                <span class="ml-2">Только с фото</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="urgent" class="form-checkbox"
+                                       {% if request.GET.urgent %}checked{% endif %}>
+                                <span class="ml-2">Срочная продажа</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Этаж</label>
-                    <div class="flex gap-2">
-                        <input type="number" placeholder="От"
-                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                        <input type="number" placeholder="До"
-                               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                    </div>
+                <div class="mt-6 flex justify-end gap-4">
+                    <a href="{% url 'all_listings' %}" class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">Очистить</a>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Применить
+                    </button>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Дополнительно</label>
-                    <div class="mt-1 space-y-2">
-                        <label class="flex items-center">
-                            <input type="checkbox" class="form-checkbox">
-                            <span class="ml-2">От собственника</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="form-checkbox">
-                            <span class="ml-2">Есть фото</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="form-checkbox">
-                            <span class="ml-2">Срочно</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-end gap-4">
-                <button class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">Очистить</button>
-                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Применить</button>
-            </div>
+            </form>
         </div>
 
         <div class="w-full max-w-7xl">
@@ -154,11 +255,6 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end">
-                        <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[80%]">
-                            <p class="text-sm">Привет!</p>
-                        </div>
-                    </div>
                 </div>
                 <div class="flex gap-2">
                     <input type="text" id="chat-input" placeholder="Введите сообщение..."
