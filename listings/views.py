@@ -206,7 +206,7 @@ def main_chat_view(request):
 @csrf_exempt
 def listing_chat_view(request):
     if request.method == 'POST':
-        data = json.loads(request)
+        data = json.loads(request.body.decode('utf-8'))
         message = data.get('message', '')
         listing_id = data.get('listing_id', '')
 
@@ -232,9 +232,12 @@ def listing_chat_view(request):
             'description': listing_details.description
         }
 
-        response = listing_chat.get_response(message, flat_data)
+        chat_response = listing_chat.get_response(message, flat_data)
 
-        return response
+        if isinstance(chat_response, str):
+            return JsonResponse({'response': chat_response})
+
+        return chat_response
 
 
 def show_my_favorites(request):

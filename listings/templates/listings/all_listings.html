@@ -234,9 +234,10 @@
             </button>
 
             <div id="chat-box"
-                 class="hidden absolute bottom-20 right-0 w-96 bg-white rounded-lg shadow-xl flex flex-col p-4 transition-all duration-300 ease-in-out">
+                 class="hidden absolute bottom-20 right-0 w-96 bg-white rounded-lg shadow-xl flex flex-col p-4 transition-all duration-300 ease-in-out"
+                 style="max-height: 32rem;">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-800">Чат-бот</h2>
+                    <h2 class="text-lg font-semibold text-gray-800">Чат-бот по недвижимости</h2>
                     <button id="close-chat" class="text-gray-500 hover:text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                              stroke="currentColor">
@@ -246,17 +247,16 @@
                     </button>
                 </div>
 
-                <div id="chat-messages" class="flex-1 overflow-y-auto mb-4 space-y-2">
-
+                <div id="chat-messages" class="flex-1 overflow-y-auto mb-4 space-y-2 pr-2">
                     <div class="flex justify-start">
-                        <div class="bg-gray-100 p-3 rounded-lg max-w-[80%]">
-                            <p class="text-sm text-gray-700">Привет! Чем могу помочь?</p>
+                        <div class="bg-gray-100 p-3 rounded-lg max-w-[80%] break-words">
+                            <p class="text-sm text-gray-700">Привет! Я могу помочь с вопросами о недвижимости. Спросите
+                                меня о квартирах, ценах или условиях покупки.</p>
                         </div>
                     </div>
-
                 </div>
                 <div class="flex gap-2">
-                    <input type="text" id="chat-input" placeholder="Введите сообщение..."
+                    <input type="text" id="chat-input" placeholder="Задайте вопрос о квартирах..."
                            class="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button id="send-message"
                             class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
@@ -272,6 +272,9 @@
         const chatToggle = document.getElementById("chat-toggle");
         const chatBox = document.getElementById("chat-box");
         const closeChat = document.getElementById("close-chat");
+        const chatInput = document.getElementById("chat-input");
+        const chatMessages = document.getElementById("chat-messages");
+        const sendMessageButton = document.getElementById("send-message");
 
         chatToggle.addEventListener("click", () => {
             chatBox.classList.toggle("hidden");
@@ -280,25 +283,35 @@
         closeChat.addEventListener("click", () => {
             chatBox.classList.add("hidden");
         });
-        const chatInput = document.getElementById("chat-input");
-        const chatMessages = document.getElementById("chat-messages");
-        const sendMessageButton = document.getElementById("send-message");
 
-        sendMessageButton.addEventListener("click", () => {
+        function isRealEstateQuestion(message) {
+            const keywords = ['квартир', 'цена', 'стоимость', 'покупк', 'продаж', 'аренд', 'метров', 'комнат', 'этаж', 'дом', 'жиль'];
+            return keywords.some(keyword => message.toLowerCase().includes(keyword));
+        }
+
+        sendMessageButton.addEventListener("click", sendMessage);
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+
+        function sendMessage() {
             const message = chatInput.value.trim();
-            if (message) {
+            if (!message) return;
 
-                chatMessages.innerHTML += `
-                <div class="flex justify-end">
-                    <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[80%]">
-                        <p class="text-sm">${message}</p>
-                    </div>
-                </div>
-            `;
-                chatInput.value = "";
+            addUserMessage(message);
+            chatInput.value = "";
 
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+            const loadingDiv = document.createElement("div");
+            loadingDiv.className = "flex justify-start";
+            loadingDiv.innerHTML = `
+            <div class="bg-gray-100 p-3 rounded-lg max-w-[80%] break-words">
+                <p class="text-sm text-gray-700">Думаю...</p>
+            </div>
+        `;
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
+            if (isRealEstateQuestion(message)) {
                 fetch("{% url 'main_chat_assistant' %}", {
                     method: "POST",
                     headers: {
@@ -309,24 +322,44 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        chatMessages.innerHTML += `
-                    <div class="flex justify-start">
-                        <div class="bg-gray-100 p-3 rounded-lg max-w-[80%]">
-                            <p class="text-sm text-gray-700">${data.response}</p>
-                        </div>
-                    </div>
-                `;
-
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        chatMessages.removeChild(loadingDiv);
+                        addBotMessage(data.response);
+                    })
+                    .catch(error => {
+                        chatMessages.removeChild(loadingDiv);
+                        addBotMessage("Произошла ошибка. Пожалуйста, попробуйте позже.");
                     });
+            } else {
+                setTimeout(() => {
+                    chatMessages.removeChild(loadingDiv);
+                    addBotMessage("Извините, я могу отвечать только на вопросы о недвижимости (квартирах, домах, ценах и т.д.).");
+                }, 500);
             }
-        });
+        }
 
-        chatInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                sendMessageButton.click();
-            }
-        });
+        function addUserMessage(message) {
+            const userMessageDiv = document.createElement("div");
+            userMessageDiv.className = "flex justify-end";
+            userMessageDiv.innerHTML = `
+            <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[80%] break-words">
+                <p class="text-sm">${message}</p>
+            </div>
+        `;
+            chatMessages.appendChild(userMessageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addBotMessage(message) {
+            const botMessageDiv = document.createElement("div");
+            botMessageDiv.className = "flex justify-start";
+            botMessageDiv.innerHTML = `
+            <div class="bg-gray-100 p-3 rounded-lg max-w-[80%] break-words">
+                <p class="text-sm text-gray-700">${message}</p>
+            </div>
+        `;
+            chatMessages.appendChild(botMessageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
         function getCookie(name) {
             let cookieValue = null;
