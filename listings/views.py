@@ -1,5 +1,4 @@
 import json
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
@@ -25,7 +24,7 @@ def show_all_listings(request):
         }
         for listing in listings
     ]
-    with open('possible_fields.json', 'r') as file:
+    with open(r'listings/possible_fields.json', 'r') as file:
         filter_values = json.load(file)
     return render(request, 'listings/all_listings.html', {'listings_with_pictures': listings_with_pictures,
                                                           'filter_values': filter_values})
