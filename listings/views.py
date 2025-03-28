@@ -344,3 +344,6 @@ def delete_comment(request, comment_id):
         return redirect('listing_detail', listing_id=listing_id)
     else:
         return render(request, 'listings/delete_comment.html', {'comment': comment})
+
+
+# TODO implement delete_picture method
