@@ -55,12 +55,13 @@
                                     <button id="likeButton" type="submit"
                                             class="flex items-center space-x-2 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition duration-300">
                                         <i id="likeIcon"
-                                           class="far fa-heart text-2xl"></i>
+                                           class="{% if user_has_liked %}fas{% else %}far{% endif %} fa-heart text-2xl text-red-500"></i>
                                         <span id="likeCount"
                                               class="text-lg text-gray-600">{{ listing.details.num_likes }}</span>
                                     </button>
                                 </form>
                             {% endif %}
+
                         </div>
                     </div>
                     <div class="bg-gray-50 p-6 rounded-lg mb-8">
@@ -147,13 +148,15 @@
                 <p class="text-lg text-gray-700">{{ listing.details.description }}</p>
             </div>
 
-            <div class="mt-8 bg-gray-50 p-6 rounded-lg">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
-                <button onclick="openContactModal()"
-                        class="w-full bg-yellow-400 text-white font-semibold py-3 rounded-lg hover:bg-yellow-500 transition duration-300">
-                    Показать контакты
-                </button>
-            </div>
+            {% if user.id != listing.user.id %}
+                <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Контакты</h2>
+                    <button onclick="openContactModal()"
+                            class="w-full bg-yellow-400 text-white font-semibold py-3 rounded-lg hover:bg-yellow-500 transition duration-300">
+                        Показать контакты
+                    </button>
+                </div>
+            {% endif %}
 
             {% if user.role == "moderator" %}
                 <div class="mt-8 bg-gray-50 p-6 rounded-lg">
@@ -293,9 +296,9 @@
                 {% endif %}
                 {% if listing.user %}
                     <div class="flex items-center space-x-3">
-                        <i class="fas fa-phone-alt text-2xl text-green-500"></i>
+                        <i class="fa-solid fa-message text-2xl text-yellow-500"></i>
                         <a href="{% url 'start_chat' user_id=listing.user.id %}"
-                           class="text-lg text-gray-700 hover:text-green-500 transition duration-300">
+                           class="text-lg text-gray-700 hover:text-yellow-500 transition duration-300">
                             Написать сообщение
                         </a>
                     </div>

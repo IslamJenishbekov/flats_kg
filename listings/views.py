@@ -155,6 +155,10 @@ def show_listing_detail(request, listing_id):
     comments = listing.comments.all().order_by('-created_at')  # Все комментарии, сортированные по дате
     pictures = listing.pictures.all()  # Все изображения объявления
 
+    user_has_liked = False
+    if request.user.is_authenticated:
+        user_has_liked = Favorites.objects.filter(user=request.user, listing=listing).exists()
+
     flat_data = {
         'room_num': listing.rooms,
         'address': listing.address,
@@ -182,6 +186,7 @@ def show_listing_detail(request, listing_id):
         'pictures': pictures,
         'predicted_price': predicted_price,
         'comment_form': comment_form,
+        "user_has_liked": user_has_liked
     }
 
     return render(request, 'listings/listing_detail.html', context)
