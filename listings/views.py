@@ -17,21 +17,89 @@ from listings.comment_form import CommentForm
 
 
 def show_all_listings(request):
-    listings = Listing.objects.filter(is_blocked=False)
-    listings_with_pictures = [
-        {
-            'listing': listing,
-            'picture': ListingPicture.objects.filter(listing=listing).first()
-        }
-        for listing in listings
-    ]
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
+    from django.shortcuts import render
+    from listings.models import Listing, ListingPicture, ListingDetail
+    import os
+    import json
 
-    with open(json_path, 'r', encoding='utf-8') as file:
-        filter_values = json.load(file)
+    def show_all_listings(request):
+        # Получаем параметры из GET-запроса
+        listing_type = request.GET.get('listing_type', '')
+        apartment_series = request.GET.get('apartment_series', '')
+        rooms = request.GET.get('rooms', '')
+        heating = request.GET.get('heating', '')
+        condition = request.GET.get('condition', '')
+        furniture = request.GET.get('furniture', '')
+        region = request.GET.get('region', '')
+        city = request.GET.get('city', '')
+        developer = request.GET.get('developer', '')
+        wall_material = request.GET.get('wall_material', '')
+        price_min = request.GET.get('price_min', '')
+        price_max = request.GET.get('price_max', '')
+        area_min = request.GET.get('area_min', '')
+        area_max = request.GET.get('area_max', '')
+        floor_min = request.GET.get('floor_min', '')
+        floor_max = request.GET.get('floor_max', '')
 
-    return render(request, 'listings/all_listings.html', {'listings_with_pictures': listings_with_pictures,
-                                                          'filter_values': filter_values})
+        # Базовый queryset с учетом is_blocked=False
+        listings = Listing.objects.filter(is_blocked=False)
+
+        # Фильтрация по полям модели Listing
+        if rooms:
+            listings = listings.filter(rooms=rooms)
+        if price_min:
+            listings = listings.filter(price__gte=price_min)
+        if price_max:
+            listings = listings.filter(price__lte=price_max)
+
+        # Фильтрация по полям модели ListingDetail через связь
+        if listing_type:
+            listings = listings.filter(details__listing_type=listing_type)
+        if apartment_series:
+            listings = listings.filter(details__apartment_series=apartment_series)
+        if heating:
+            listings = listings.filter(details__heating=heating)
+        if condition:
+            listings = listings.filter(details__condition=condition)
+        if furniture:
+            listings = listings.filter(details__furniture=furniture)
+        if region:
+            listings = listings.filter(details__region=region)
+        if city:
+            listings = listings.filter(details__city=city)
+        if developer:
+            listings = listings.filter(details__developer=developer)
+        if wall_material:
+            listings = listings.filter(details__wall_material=wall_material)
+        if area_min:
+            listings = listings.filter(details__area__gte=area_min)
+        if area_max:
+            listings = listings.filter(details__area__lte=area_max)
+        if floor_min:
+            listings = listings.filter(details__floor__gte=floor_min)
+        if floor_max:
+            listings = listings.filter(details__floor__lte=floor_max)
+        print("FJDLFJKLDS")
+
+        # Получаем список объявлений с первой картинкой
+        listings_with_pictures = [
+            {
+                'listing': listing,
+                'picture': ListingPicture.objects.filter(listing=listing).first()
+            }
+            for listing in listings
+        ]
+
+        # Загружаем возможные значения фильтров из JSON
+        json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
+        with open(json_path, 'r', encoding='utf-8') as file:
+            filter_values = json.load(file)
+
+        # Передаем данные в шаблон
+        return render(request, 'listings/all_listings.html', {
+            'listings_with_pictures': listings_with_pictures,
+            'filter_values': filter_values,
+        })
 
 
 def create_listing(request):
@@ -138,7 +206,12 @@ def show_listing_detail(request, listing_id):
                 favorite.save()
             listing_details.save()
 
-    if request.method == 'POST':
+    if request.user.role == "support" and request.method == "POST":
+        listing = get_object_or_404(Listing, id=listing_id)
+        listing.is_blocked = False
+        print('unblocked')
+        listing.save(update_fields=['is_blocked'])
+    elif request.method == 'POST':
         if not request.user.is_authenticated:
             return redirect('login')  # Redirect to login if not authenticated
         form = CommentForm(request.POST)
@@ -186,7 +259,7 @@ def show_listing_detail(request, listing_id):
         'pictures': pictures,
         'predicted_price': predicted_price,
         'comment_form': comment_form,
-        "user_has_liked": user_has_liked
+        "user_has_liked": user_has_liked,
     }
 
     return render(request, 'listings/listing_detail.html', context)
@@ -229,7 +302,8 @@ def listing_chat_view(request):
             'developer': listing_details.developer,
             'region': listing_details.region,
             'city': listing_details.city,
-            'description': listing_details.description
+            'description': listing_details.description,
+            'price': listing.price,
         }
 
         chat_response = listing_chat.get_response(message, flat_data)
@@ -348,5 +422,20 @@ def delete_comment(request, comment_id):
     else:
         return render(request, 'listings/delete_comment.html', {'comment': comment})
 
+
+def show_another_user_listings(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user_listings = Listing.objects.filter(user=user, is_blocked=False)
+    if request.user.role == "support":
+        user_listings = Listing.objects.filter(user=user)
+
+    listings_with_pictures = [
+        {
+            'listing': listing,
+            'picture': ListingPicture.objects.filter(listing=listing).first()
+        }
+        for listing in user_listings
+    ]
+    return render(request, 'listings/another_user_listings.html', {'listings_with_pictures': listings_with_pictures})
 
 # TODO implement delete_picture method

@@ -12,4 +12,13 @@ class Blocking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Blocking {self.id}"
+        return f"Blocking listing {self.id}"
+
+
+class UserBlocking(models.Model):
+    user = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name="user_blocking")
+    blocking_cause = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Blocking user {self.user.id}"

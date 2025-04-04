@@ -154,22 +154,6 @@
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
                         </div>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Дополнительно</label>
-                        <div class="mt-1 space-y-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="has_photo" class="form-checkbox"
-                                       {% if request.GET.has_photo %}checked{% endif %}>
-                                <span class="ml-2">Только с фото</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="urgent" class="form-checkbox"
-                                       {% if request.GET.urgent %}checked{% endif %}>
-                                <span class="ml-2">Срочная продажа</span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="mt-6 flex justify-end gap-4">
@@ -311,30 +295,23 @@
             chatMessages.appendChild(loadingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            if (isRealEstateQuestion(message)) {
-                fetch("{% url 'main_chat_assistant' %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
-                    body: JSON.stringify({"message": message})
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        chatMessages.removeChild(loadingDiv);
-                        addBotMessage(data.response);
-                    })
-                    .catch(error => {
-                        chatMessages.removeChild(loadingDiv);
-                        addBotMessage("Произошла ошибка. Пожалуйста, попробуйте позже.");
-                    });
-            } else {
-                setTimeout(() => {
+            fetch("{% url 'main_chat_assistant' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify({"message": message})
+            })
+                .then(response => response.json())
+                .then(data => {
                     chatMessages.removeChild(loadingDiv);
-                    addBotMessage("Извините, я могу отвечать только на вопросы о недвижимости (квартирах, домах, ценах и т.д.).");
-                }, 500);
-            }
+                    addBotMessage(data.response);
+                })
+                .catch(error => {
+                    chatMessages.removeChild(loadingDiv);
+                    addBotMessage("Произошла ошибка. Пожалуйста, попробуйте позже.");
+                });
         }
 
         function addUserMessage(message) {

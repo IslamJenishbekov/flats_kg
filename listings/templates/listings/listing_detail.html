@@ -64,6 +64,11 @@
 
                         </div>
                     </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                        <div class="flex justify-between items-center">
+                            <a href="{% url 'users:another_profile' user_id=listing.user.id %}">{{ listing.user.username }}</a>
+                        </div>
+                    </div>
                     <div class="bg-gray-50 p-6 rounded-lg mb-8">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4">Основные характеристики</h2>
                         <div class="grid grid-cols-2 gap-4">
@@ -156,6 +161,44 @@
                         Показать контакты
                     </button>
                 </div>
+            {% endif %}
+            {% if request.user.role == 'support' and listing.is_blocked == True %}
+                <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+                    <p>Разблокировать объявление</p>
+                    <button data-url="{% url 'listing_detail' listing_id=listing.id %}"
+                            onclick="unblockListing({{ listing.id }})"
+                            class="mt-2 px-4 py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                        Разблокировать
+                    </button>
+                </div>
+
+                <script>
+                    function unblockListing(listingId) {
+                        const url = document.querySelector('button[data-url]').getAttribute('data-url');
+
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({
+                                action: 'unblock'  // Указываем действие разблокировки
+                            })
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    console.log('Объявление успешно разблокировано');
+                                    window.location.reload(); // Обновляем страницу после успеха
+                                } else {
+                                    console.error('Ошибка при разблокировке');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Ошибка:', error);
+                            });
+                    }
+                </script>
             {% endif %}
 
             {% if user.role == "moderator" %}
@@ -449,30 +492,23 @@
             chatMessages.appendChild(loadingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            if (isRealEstateQuestion(message)) {
-                fetch("{% url 'listing_chat_assistant' %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
-                    body: JSON.stringify({"message": message, "listing_id": {{ listing.id }}})
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        chatMessages.removeChild(loadingDiv);
-                        addBotMessage(data.response);
-                    })
-                    .catch(error => {
-                        chatMessages.removeChild(loadingDiv);
-                        addBotMessage("Произошла ошибка. Пожалуйста, попробуйте позже.");
-                    });
-            } else {
-                setTimeout(() => {
+            fetch("{% url 'listing_chat_assistant' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify({"message": message, "listing_id": {{ listing.id }}})
+            })
+                .then(response => response.json())
+                .then(data => {
                     chatMessages.removeChild(loadingDiv);
-                    addBotMessage("Извините, я могу отвечать только на вопросы о недвижимости (квартирах, домах, ценах и т.д.).");
-                }, 500);
-            }
+                    addBotMessage(data.response);
+                })
+                .catch(error => {
+                    chatMessages.removeChild(loadingDiv);
+                    addBotMessage("Произошла ошибка. Пожалуйста, попробуйте позже.");
+                });
         }
 
         function addUserMessage(message) {

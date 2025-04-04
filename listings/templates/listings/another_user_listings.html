@@ -1,0 +1,97 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <div class="flex flex-col items-center p-5">
+        <h1 class="text-2xl font-bold mb-5">Объвления</h1>
+
+        <div class="w-full max-w-7xl">
+            {% for listing_info in listings_with_pictures %}
+                <div class="relative">
+                    <a href="{% url 'listing_detail' listing_info.listing.id %}" class="no-underline text-inherit">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col md:flex-row mb-5 relative {% if listing_info.listing.is_blocked %}opacity-70{% endif %}">
+                            <div class="w-full md:w-1/3">
+                                <div class="h-48 md:h-64 flex justify-center items-center overflow-hidden bg-gray-100">
+                                    {% if listing_info.picture %}
+                                        {% if listing_info.picture.image_base64 %}
+                                            <img src="data:image/jpeg;base64,{{ listing_info.picture.image_base64 }}"
+                                                 alt="Listing Picture"
+                                                 class="w-full h-full object-cover {% if listing_info.listing.is_blocked %}grayscale{% endif %}">
+                                        {% else %}
+                                            <img src="{{ listing_info.picture.image.url }}" alt="Listing Picture"
+                                                 class="w-full h-full object-cover {% if listing_info.listing.is_blocked %}grayscale{% endif %}">
+                                        {% endif %}
+                                    {% else %}
+                                        <p class="text-gray-500 text-sm">Нет изображения</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="w-full md:w-2/3 p-4 md:p-6">
+                                <h2 class="text-xl font-bold mb-2 text-gray-800 {% if listing_info.listing.is_blocked %}text-gray-500{% endif %}">
+                                    {{ listing_info.listing.rooms }}-комн.
+                                    апартаменты, {{ listing_info.listing.details.area }}
+                                    м², {{ listing_info.listing.details.floor }}/{{ listing_info.listing.details.total_floors }}
+                                    этаж
+                                </h2>
+                                <div class="mb-4">
+                                    <p class="{% if listing_info.listing.is_blocked %}text-gray-400{% else %}text-gray-600{% endif %}">
+                                        ЖК «{{ listing_info.listing.details.developer }}»</p>
+                                    <p class="{% if listing_info.listing.is_blocked %}text-gray-400{% else %}text-gray-600{% endif %}">
+                                        сдача ГК: 3 кв. {{ listing_info.listing.details.year_built }} года</p>
+                                    <p class="{% if listing_info.listing.is_blocked %}text-gray-400{% else %}text-gray-600{% endif %}">{{ listing_info.listing.address }}</p>
+                                </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <div class="text-2xl font-bold {% if listing_info.listing.is_blocked %}text-gray-500{% else %}text-gray-800{% endif %}">
+                                        {{ listing_info.listing.price }} $
+                                    </div>
+                                </div>
+                                <p class="{% if listing_info.listing.is_blocked %}text-gray-400{% else %}text-gray-600{% endif %} mt-4 hidden md:block">
+                                    Продаются апартаменты общей площадью {{ listing_info.listing.details.area }} кв. м.
+                                    с {{ listing_info.listing.rooms }}-мя спальнями и кухней-гостиной.
+                                    Компания {{ listing_info.listing.details.developer }} представляет проект
+                                    "{{ listing_info.listing.details.project_name }}" в исключительной локации —
+                                    на {{ listing_info.listing.details.location }}.
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 class="text-lg font-medium mb-4">Подтверждение удаления</h3>
+            <p class="text-gray-600 mb-6">Вы уверены, что хотите удалить это объявление? Это действие нельзя
+                отменить.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="hideDeleteModal()"
+                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                    Отмена
+                </button>
+                <form id="delete-form" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                        Удалить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDeleteModal(listingId) {
+            const modal = document.getElementById('delete-modal');
+            const form = document.getElementById('delete-form');
+
+            form.action = "{% url 'delete_listing' 0 %}".replace('0', listingId);
+
+            modal.classList.remove('hidden');
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+    </script>
+{% endblock %}
