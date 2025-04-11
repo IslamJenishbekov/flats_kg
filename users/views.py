@@ -62,7 +62,7 @@ def show_user_profile(request, user_id):
         return redirect('users:another_profile', user_id=user_id)
 
     elif request.user.role == "support" and user.is_blocked is True:
-        blocking = get_object_or_404(UserBlocking, user=user)
+        blocking = UserBlocking.objects.filter(user=user).order_by('-created_at').first()
         return render(request, 'users/another_profile.html', {'user': user, 'blocking': blocking})
     blocked_listings = Listing.objects.filter(
         user=user,
