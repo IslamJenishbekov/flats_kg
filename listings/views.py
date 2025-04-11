@@ -13,75 +13,79 @@ from .services import get_predicted_price, main_chat, listing_chat
 from django.contrib import messages
 import io
 from listings.comment_form import CommentForm
+from django.core.paginator import Paginator
 
 
 def show_all_listings(request):
-    # # Получаем параметры из GET-запроса
-    # listing_type = request.GET.get('listing_type', '')
-    # apartment_series = request.GET.get('apartment_series', '')
-    # rooms = request.GET.get('rooms', '')
-    # heating = request.GET.get('heating', '')
-    # condition = request.GET.get('condition', '')
-    # furniture = request.GET.get('furniture', '')
-    # region = request.GET.get('region', '')
-    # city = request.GET.get('city', '')
-    # developer = request.GET.get('developer', '')
-    # wall_material = request.GET.get('wall_material', '')
-    # price_min = request.GET.get('price_min', '')
-    # price_max = request.GET.get('price_max', '')
-    # area_min = request.GET.get('area_min', '')
-    # area_max = request.GET.get('area_max', '')
-    # floor_min = request.GET.get('floor_min', '')
-    # floor_max = request.GET.get('floor_max', '')
-    #
-    # # Базовый queryset с учетом is_blocked=False
-    # listings = Listing.objects.filter(is_blocked=False)
-    #
-    # # Фильтрация по полям модели Listing
-    # if rooms:
-    #     listings = listings.filter(rooms=rooms)
-    # if price_min:
-    #     listings = listings.filter(price__gte=price_min)
-    # if price_max:
-    #     listings = listings.filter(price__lte=price_max)
-    #
-    # # Фильтрация по полям модели ListingDetail через связь
-    # if listing_type:
-    #     listings = listings.filter(details__listing_type=listing_type)
-    # if apartment_series:
-    #     listings = listings.filter(details__apartment_series=apartment_series)
-    # if heating:
-    #     listings = listings.filter(details__heating=heating)
-    # if condition:
-    #     listings = listings.filter(details__condition=condition)
-    # if furniture:
-    #     listings = listings.filter(details__furniture=furniture)
-    # if region:
-    #     listings = listings.filter(details__region=region)
-    # if city:
-    #     listings = listings.filter(details__city=city)
-    # if developer:
-    #     listings = listings.filter(details__developer=developer)
-    # if wall_material:
-    #     listings = listings.filter(details__wall_material=wall_material)
-    # if area_min:
-    #     listings = listings.filter(details__area__gte=area_min)
-    # if area_max:
-    #     listings = listings.filter(details__area__lte=area_max)
-    # if floor_min:
-    #     listings = listings.filter(details__floor__gte=floor_min)
-    # if floor_max:
-    #     listings = listings.filter(details__floor__lte=floor_max)
-    # print("FJDLFJKLDS")
+    # Получаем параметры из GET-запроса
+    listing_type = request.GET.get('listing_type', '')
+    apartment_series = request.GET.get('apartment_series', '')
+    rooms = request.GET.get('rooms', '')
+    heating = request.GET.get('heating', '')
+    condition = request.GET.get('condition', '')
+    furniture = request.GET.get('furniture', '')
+    region = request.GET.get('region', '')
+    city = request.GET.get('city', '')
+    developer = request.GET.get('developer', '')
+    wall_material = request.GET.get('wall_material', '')
+    price_min = request.GET.get('price_min', '')
+    price_max = request.GET.get('price_max', '')
+    area_min = request.GET.get('area_min', '')
+    area_max = request.GET.get('area_max', '')
+    floor_min = request.GET.get('floor_min', '')
+    floor_max = request.GET.get('floor_max', '')
 
-    listings = Listing.objects.all()
-    # Получаем список объявлений с первой картинкой
+    # Базовый queryset с учетом is_blocked=False
+    listings = Listing.objects.filter(is_blocked=False)
+
+    # Фильтрация по полям модели Listing
+    if rooms:
+        listings = listings.filter(rooms=rooms)
+    if price_min:
+        listings = listings.filter(price__gte=price_min)
+    if price_max:
+        listings = listings.filter(price__lte=price_max)
+
+    # Фильтрация по полям модели ListingDetail через связь
+    if listing_type:
+        listings = listings.filter(details__listing_type=listing_type)
+    if apartment_series:
+        listings = listings.filter(details__apartment_series=apartment_series)
+    if heating:
+        listings = listings.filter(details__heating=heating)
+    if condition:
+        listings = listings.filter(details__condition=condition)
+    if furniture:
+        listings = listings.filter(details__furniture=furniture)
+    if region:
+        listings = listings.filter(details__region=region)
+    if city:
+        listings = listings.filter(details__city=city)
+    if developer:
+        listings = listings.filter(details__developer=developer)
+    if wall_material:
+        listings = listings.filter(details__wall_material=wall_material)
+    if area_min:
+        listings = listings.filter(details__area__gte=area_min)
+    if area_max:
+        listings = listings.filter(details__area__lte=area_max)
+    if floor_min:
+        listings = listings.filter(details__floor__gte=floor_min)
+    if floor_max:
+        listings = listings.filter(details__floor__lte=floor_max)
+
+    # Пагинация
+    paginator = Paginator(listings, 10)  # Показывать 10 объявлений на странице
+    page_number = request.GET.get('page')  # Получаем номер страницы из GET-запроса
+    page_obj = paginator.get_page(page_number)  # Получаем объект страницы
+
+    # Получаем список объявлений с первой картинкой только для текущей страницы
     listings_with_pictures = [
         {
             'listing': listing,
             'picture': ListingPicture.objects.filter(listing=listing).first()
         }
-        for listing in listings
+        for listing in page_obj  # Используем page_obj вместо listings
     ]
 
     # Загружаем возможные значения фильтров из JSON
@@ -93,6 +97,7 @@ def show_all_listings(request):
     return render(request, 'listings/all_listings.html', {
         'listings_with_pictures': listings_with_pictures,
         'filter_values': filter_values,
+        'page_obj': page_obj,  # Передаем объект пагинации для шаблона
     })
 
 
