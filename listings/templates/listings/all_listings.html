@@ -220,6 +220,49 @@
                     </div>
                 </a>
             {% endfor %}
+            <div class="flex justify-center mt-8 mb-8">
+                <nav class="inline-flex rounded-md shadow">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1
+                                {% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            &laquo; Первая
+                        </a>
+                        <a href="?page=
+                                {{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            Предыдущая
+                        </a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="px-3 py-2 border-t border-b border-gray-300 bg-blue-500 text-white">
+                    {{ num }}
+                </span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page=
+                                    {{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                               class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page=
+                                {{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            Следующая
+                        </a>
+                        <a href="?page=
+                                {{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            Последняя &raquo;
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
         </div>
 
         <div id="chat-container" class="fixed bottom-6 right-6">
