@@ -64,11 +64,6 @@
 
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                        <div class="flex justify-between items-center">
-                            <a href="{% url 'users:another_profile' user_id=listing.user.id %}">{{ listing.user.username }}</a>
-                        </div>
-                    </div>
                     <div class="bg-gray-50 p-6 rounded-lg mb-8">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4">Основные характеристики</h2>
                         <div class="grid grid-cols-2 gap-4">
@@ -164,10 +159,10 @@
             {% endif %}
             {% if request.user.role == 'support' and listing.is_blocked == True %}
                 <div class="mt-8 bg-gray-50 p-6 rounded-lg">
-                    <p>Разблокировать объявление</p>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Разблокировать объявление</h2>
                     <button data-url="{% url 'listing_detail' listing_id=listing.id %}"
                             onclick="unblockListing({{ listing.id }})"
-                            class="mt-2 px-4 py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                            class="w-full bg-yellow-400 text-white font-semibold py-3 rounded-lg hover:bg-yellow-500 transition duration-300">
                         Разблокировать
                     </button>
                 </div>
@@ -383,6 +378,15 @@
                         </a>
                     </div>
                 {% endif %}
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-user text-xl text-gray-600"></i>
+                        <a href="{% url 'users:another_profile' user_id=listing.user.id %}"
+                           class="text-lg text-gray-700 hover:text-yellow-500 transition duration-300">
+                            {{ listing.user.username }}
+                        </a>
+                    </div>
+                </div>
             </div>
             <button onclick="closeContactModal()"
                     class="mt-6 w-full bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition duration-300">
