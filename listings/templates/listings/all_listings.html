@@ -129,9 +129,13 @@
                         <label class="block text-sm font-medium text-gray-700">Цена ($)</label>
                         <div class="flex gap-2">
                             <input type="number" name="price_min" placeholder="От" value="{{ request.GET.price_min }}"
+                                   min="1"
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+
                             <input type="number" name="price_max" placeholder="До" value="{{ request.GET.price_max }}"
+                                   min="1"
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+
                         </div>
                     </div>
 
@@ -139,8 +143,11 @@
                         <label class="block text-sm font-medium text-gray-700">Площадь (м²)</label>
                         <div class="flex gap-2">
                             <input type="number" name="area_min" placeholder="От" value="{{ request.GET.area_min }}"
+                                   min="1" max="1000"
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+
                             <input type="number" name="area_max" placeholder="До" value="{{ request.GET.area_max }}"
+                                   min="1" max="1000"
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
                         </div>
                     </div>
@@ -149,9 +156,13 @@
                         <label class="block text-sm font-medium text-gray-700">Этаж</label>
                         <div class="flex gap-2">
                             <input type="number" name="floor_min" placeholder="От" value="{{ request.GET.floor_min }}"
+                                   min="1" max="20"
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+
                             <input type="number" name="floor_max" placeholder="До" value="{{ request.GET.floor_max }}"
+                                   min="1" max="20"
                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+
                         </div>
                     </div>
                 </div>
@@ -352,5 +363,33 @@
             }
             return cookieValue;
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputs = document.querySelectorAll("input[type='number']");
+
+            inputs.forEach(input => {
+                input.addEventListener("input", function () {
+                    const name = this.name;
+                    const value = parseInt(this.value);
+
+                    if (value < 1) {
+                        this.value = "";
+                        return;
+                    }
+
+                    if ((name === "area_min" || name === "area_max") && value > 1000) {
+                        this.value = "1000";
+                        return;
+                    }
+
+                    if ((name === "floor_min" || name === "floor_max") && value > 20) {
+                        this.value = "20";
+                        return;
+                    }
+                });
+            });
+        });
+
+
     </script>
 {% endblock %}
