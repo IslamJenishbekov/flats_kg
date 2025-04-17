@@ -411,15 +411,12 @@ def edit_comment(request, comment_id):
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(ListingComment, id=comment_id)
-    if comment.user != request.user:
-        return redirect('listing_detail', listing_id=comment.listing.id)  # Only owner can delete
-
-    if request.method == 'POST':
-        listing_id = comment.listing.id
+    listing_id = comment.listing.id
+    if request.method == 'POST' and comment.user != request.user:
         comment.delete()
         return redirect('listing_detail', listing_id=listing_id)
-    else:
-        return render(request, 'listings/delete_comment.html', {'comment': comment})
+    comment.delete()
+    return redirect('listing_detail', listing_id=listing_id)
 
 
 def show_another_user_listings(request, user_id):

@@ -10,14 +10,10 @@ import json
 
 @login_required
 def get_new_messages(request, room_id):
-    # Получаем комнату чата или возвращаем 404, если её нет
     chat_room = get_object_or_404(ChatRoom, id=room_id)
-    # Получаем ID последнего известного сообщения из GET-параметра (по умолчанию 0)
     last_message_id = request.GET.get('last_message_id', 0)
-    # Фильтруем сообщения с ID больше последнего известного
     new_messages = Message.objects.filter(chat_room=chat_room, id__gt=last_message_id).order_by('timestamp')
 
-    # Формируем данные для ответа в формате JSON
     messages_data = [
         {
             'id': message.id,
