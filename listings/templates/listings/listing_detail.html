@@ -2,9 +2,7 @@
 
 {% block content %}
     <div class="flex flex-col flex-grow justify-center bg-gray-50 py-8">
-
         <div class="max-w-7xl w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
-
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">Объявление за {{ listing.price }} $</h1>
                 <p class="text-lg text-gray-600 mt-2">{{ listing.details.region }}, {{ listing.details.city }}</p>
@@ -27,10 +25,10 @@
                         </div>
                     </div>
                     <button class="carousel-prev absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
-                        &larr;
+                        ←
                     </button>
                     <button class="carousel-next absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75">
-                        &rarr;
+                        →
                     </button>
                     <div class="flex mt-4 space-x-2 overflow-x-auto">
                         {% for picture in pictures %}
@@ -40,7 +38,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
 
                 <div class="space-y-6 col-span-6">
                     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -61,7 +58,6 @@
                                     </button>
                                 </form>
                             {% endif %}
-
                         </div>
                     </div>
                     <div class="bg-gray-50 p-6 rounded-lg mb-8">
@@ -74,7 +70,6 @@
                                     <p class="text-lg text-gray-900">{{ listing.details.listing_type }}</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-ruler-combined text-2xl text-green-500"></i>
                                 <div>
@@ -82,7 +77,6 @@
                                     <p class="text-lg text-gray-900">{{ listing.details.area }} м²</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-layer-group text-2xl text-purple-500"></i>
                                 <div>
@@ -91,7 +85,6 @@
                                         из {{ listing.details.total_floors }}</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-calendar-alt text-2xl text-yellow-500"></i>
                                 <div>
@@ -99,7 +92,6 @@
                                     <p class="text-lg text-gray-900">{{ listing.details.year_built }}</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-home text-2xl text-red-500"></i>
                                 <div>
@@ -107,7 +99,6 @@
                                     <p class="text-lg text-gray-900">{{ listing.details.wall_material }}</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-fire text-2xl text-orange-500"></i>
                                 <div>
@@ -115,7 +106,6 @@
                                     <p class="text-lg text-gray-900">{{ listing.details.heating }}</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-paint-roller text-2xl text-indigo-500"></i>
                                 <div>
@@ -123,7 +113,6 @@
                                     <p class="text-lg text-gray-900">{{ listing.details.condition }}</p>
                                 </div>
                             </div>
-
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-couch text-2xl text-pink-500"></i>
                                 <div>
@@ -139,7 +128,6 @@
                             <p class="text-3xl font-bold text-green-600">{{ predicted_price }} $</p>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -178,13 +166,13 @@
                                 'X-CSRFToken': '{{ csrf_token }}'
                             },
                             body: JSON.stringify({
-                                action: 'unblock'  // Указываем действие разблокировки
+                                action: 'unblock'
                             })
                         })
                             .then(response => {
                                 if (response.ok) {
                                     console.log('Объявление успешно разблокировано');
-                                    window.location.reload(); // Обновляем страницу после успеха
+                                    window.location.reload();
                                 } else {
                                     console.error('Ошибка при разблокировке');
                                 }
@@ -242,7 +230,7 @@
                     }
 
                     function closeBlockModal() {
-                        const modal = document.getElementById('blockModal');
+                        const modal = DOCUMENT.getElementById('blockModal');
                         modal.classList.add('hidden');
                     }
 
@@ -278,12 +266,14 @@
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">Комментарии</h2>
                 <div class="space-y-4">
                     {% for comment in comments %}
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <div class="bg-white p-4 rounded-lg shadow-sm" id="comment-{{ comment.id }}">
                             <p class="text-sm font-medium text-gray-600">{{ comment.user.username }}</p>
                             <p class="text-lg font-semibold text-gray-900">{{ comment.comment }}</p>
                             {% if comment.user == request.user %}
                                 <div class="mt-2 space-x-4">
-                                    <a href="{% url 'edit_comment' comment.id %}" class="text-blue-500 hover:underline">Редактировать</a>
+                                    <button onclick="openEditModal({{ comment.id }}, '{{ comment.comment|escapejs }}')"
+                                            class="text-blue-500 hover:underline">Редактировать
+                                    </button>
                                     <a href="{% url 'delete_comment' comment.id %}"
                                        class="text-red-500 hover:underline">Удалить</a>
                                 </div>
@@ -295,6 +285,7 @@
                 </div>
             </div>
         </div>
+
         <div id="chat-container" class="fixed bottom-6 right-6">
             <button id="chat-toggle"
                     class="bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-blue-700 transition-all transform hover:scale-110">
@@ -315,7 +306,7 @@
                     </button>
                 </div>
 
-                <div id="chat-messages" class="flex-1 overflow-y-auto mb-4 space-y-2 pr-2">
+                <div id="chat-messages" class="flex-1 overflow-y-auto mb-4 space-y-2 pr-V2 loop">
                     <div class="flex justify-start">
                         <div class="bg-gray-100 p-3 rounded-lg max-w-[80%] break-words">
                             <p class="text-sm text-gray-700">Привет! Я могу помочь с вопросами о недвижимости. Спросите
@@ -340,7 +331,7 @@
             <img id="modalImage" src="" alt="Увеличенное фото" class="max-w-full max-h-screen">
             <button onclick="closeModal()"
                     class="absolute top-4 right-4 text-white text-2xl bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75">
-                &times;
+                ×
             </button>
         </div>
     </div>
@@ -392,6 +383,32 @@
                     class="mt-6 w-full bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-300 transition duration-300">
                 Закрыть
             </button>
+        </div>
+    </div>
+
+    <div id="editCommentModal"
+         class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-lg w-11/12 max-w-md">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Редактировать комментарий</h2>
+            <form id="editCommentForm" method="post" action="{% url 'edit_comment' comment_id=0 %}" data-comment-id="0">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="editCommentText" class="block text-sm font-medium text-gray-700">Комментарий:</label>
+                    <textarea id="editCommentText" name="comment" rows="4"
+                              class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                              required></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeEditModal()"
+                            class="bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-300">
+                        Отмена
+                    </button>
+                    <button type="submit"
+                            class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+                        Сохранить
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -451,6 +468,20 @@
 
         function closeContactModal() {
             const modal = document.getElementById('contactModal');
+            modal.classList.add('hidden');
+        }
+
+        function openEditModal(commentId, commentText) {
+            const modal = document.getElementById('editCommentModal');
+            const form = document.getElementById('editCommentForm');
+            const textarea = document.getElementById('editCommentText');
+            form.action = '{% url "edit_comment" 0 %}'.replace('0', commentId); // Dynamically set URL
+            textarea.value = commentText;
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editCommentModal');
             modal.classList.add('hidden');
         }
 

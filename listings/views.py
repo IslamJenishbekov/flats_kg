@@ -14,6 +14,7 @@ from django.contrib import messages
 import io
 from listings.comment_form import CommentForm
 from django.core.paginator import Paginator
+from django.http import HttpResponseForbidden
 
 
 def show_all_listings(request):
@@ -394,18 +395,20 @@ def delete_listing(request, listing_id):
 @login_required
 def edit_comment(request, comment_id):
     comment = get_object_or_404(ListingComment, id=comment_id)
+
+    # Check if the user is the owner of the comment
     if comment.user != request.user:
-        return redirect('listing_detail', listing_id=comment.listing.id)  # Only owner can edit
+        return HttpResponseForbidden("You are not allowed to edit this comment.")
 
-    if request.method == 'POST':
-        form = CommentForm(request.POST, instance=comment)
-        if form.is_valid():
-            form.save()
-            return redirect('listing_detail', listing_id=comment.listing.id)
-    else:
-        form = CommentForm(instance=comment)
+    if request.method == "POST":
+        comment_text = request.POST.get("comment")
+        if comment_text:
+            comment.comment = comment_text
+            comment.save()
+            return redirect("listing_detail", listing_id=comment.listing.id)
 
-    return render(request, 'listings/edit_comment.html', {'form': form, 'comment': comment})
+    # If not a POST request, redirect back to listing detail
+    return redirect("listing_detail", listing_id=comment.listing.id)
 
 
 @login_required
