@@ -28,4 +28,5 @@ urlpatterns = [
     path('support/', include('support.urls')),
     path('', lambda request: redirect('listings/all', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('custom_admin/', include('custom_admin.urls')),
 ]

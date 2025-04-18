@@ -26,6 +26,8 @@ def profile_view(request):
         request.user.avatar_base64 = img_base64
         request.user.save()
         return redirect('users:profile')  # Предполагается, что у вас есть name='profile' в urls.py
+    if request.user.is_superuser:
+        return redirect('custom_admin:admin_profile')
     return render(request, 'users/profile.html')
 
 
