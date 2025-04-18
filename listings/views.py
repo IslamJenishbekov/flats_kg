@@ -172,7 +172,7 @@ def show_my_listings(request):
     ]
     return render(request, 'listings/my_listings.html', {'listings_with_pictures': listings_with_pictures})
 
-
+@login_required
 def show_listing_detail(request, listing_id):
     if request.method == "POST" and request.user.role == 'moderator':
         listing_id = request.POST.get('listing_id')
