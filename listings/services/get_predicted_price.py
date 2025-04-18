@@ -34,7 +34,7 @@ def get_predicted_price(flat_data: dict) -> float:
     # Предсказание
     try:
         predicted_price = catboost_model.predict([sample])[0]
-        return float(predicted_price)
+        return round(float(predicted_price), 2)
     except Exception as e:
         print("[EXCEPTION] Error during prediction")
         for i, f in enumerate(features):
