@@ -158,8 +158,12 @@ def create_listing(request):
 
         return redirect("users:profile")
 
-    with open(r'listings/possible_fields.json', 'r', encoding='utf-8') as file:
-        context = json.load(file)
+    context = dict()
+    for ob in FeatureOptions.objects.all():
+        if ob.feature_name in context.keys():
+            context[ob.feature_name].append(ob.option)
+        else:
+            context[ob.feature_name] = [ob.option]
     return render(request, 'listings/create_listing.html', context)
 
 
@@ -372,10 +376,6 @@ def edit_listing(request, listing_id):
 
         return redirect('listing_detail', listing_id=listing.id)  # Перенаправление после сохранения
 
-    # json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
-    #
-    # with open(json_path, 'r', encoding='utf-8') as file:
-    #     context = json.load(file)
     context = dict()
     for ob in FeatureOptions.objects.all():
         if ob.feature_name in context.keys():

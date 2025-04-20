@@ -1,14 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from users.models import User
+from listings.models import FeatureOptions
 
 
 def show_admin_profile(request):
     return render(request, 'custom_admin/admin_profile.html')
-
-
-from django.shortcuts import render
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib import messages
-from users.models import User
 
 
 @staff_member_required
@@ -46,3 +44,38 @@ def manage_user_role(request):
         'error_message': error_message,
         'success_message': success_message,
     })
+
+
+@staff_member_required
+def manage_filters(request):
+    context = {}
+    for ob in FeatureOptions.objects.all():
+        if ob.feature_name in context:
+            context[ob.feature_name].append(ob.option)
+        else:
+            context[ob.feature_name] = [ob.option]
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add':
+            feature_name_select = request.POST.get('feature_name_select')
+            new_feature_name = request.POST.get('new_feature_name')
+            option = request.POST.get('option')
+
+            # Определяем, какое имя фильтра использовать
+            feature_name = new_feature_name if feature_name_select == 'other' and new_feature_name else feature_name_select
+
+            if feature_name and option:
+                FeatureOptions.objects.create(feature_name=feature_name, option=option)
+                messages.success(request, 'Фильтр успешно добавлен!')
+            else:
+                messages.error(request, 'Заполните все обязательные поля!')
+            return redirect('custom_admin:manage_filters')
+        elif action == 'delete':
+            feature_name = request.POST.get('feature_name')
+            option = request.POST.get('option')
+            FeatureOptions.objects.filter(feature_name=feature_name, option=option).delete()
+            messages.success(request, 'Фильтр успешно удален!')
+            return redirect('custom_admin:manage_filters')
+
+    return render(request, 'custom_admin/manage_filters.html', {'filters': context})
