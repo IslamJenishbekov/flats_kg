@@ -2,11 +2,34 @@ from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from users.models import User
-from listings.models import FeatureOptions
+from listings.models import *
 
 
 def show_admin_profile(request):
-    return render(request, 'custom_admin/admin_profile.html')
+    users_gen_num = User.objects.count()
+    number_blocked_users = User.objects.filter(is_blocked=True).count()
+    number_active_users = User.objects.filter(is_blocked=False).count()
+    seller_count = Listing.objects.values('user').distinct().count()
+
+    listings_gen_num = Listing.objects.count()
+    number_blocked_listings = Listing.objects.filter(is_blocked=True).count()
+    number_active_listings = Listing.objects.filter(is_blocked=False).count()
+
+    new_listings = Listing.objects.values('created_at')
+    new_users = User.objects.values('created_at')
+
+    context = {
+        'users_gen_num': users_gen_num,
+        'number_blocked_users': number_blocked_users,
+        'number_active_users': number_active_users,
+        'seller_count': seller_count,
+        'listings_gen_num': listings_gen_num,
+        'number_blocked_listings': number_blocked_listings,
+        'number_active_listings': number_active_listings,
+        'new_listings': new_listings,
+        'new_users': new_users,
+    }
+    return render(request, 'custom_admin/admin_profile.html', context=context)
 
 
 @staff_member_required
