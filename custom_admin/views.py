@@ -9,7 +9,7 @@ def show_admin_profile(request):
     users_gen_num = User.objects.count()
     number_blocked_users = User.objects.filter(is_blocked=True).count()
     number_active_users = User.objects.filter(is_blocked=False).count()
-    seller_count = Listing.objects.values('user').distinct().count()
+    seller_count = Listing.objects.filter(is_blocked=False).values('user').distinct().count()
 
     listings_gen_num = Listing.objects.count()
     number_blocked_listings = Listing.objects.filter(is_blocked=True).count()
