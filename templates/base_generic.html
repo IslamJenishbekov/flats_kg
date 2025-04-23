@@ -6,6 +6,7 @@
     <title>{% block title %}Flats KG{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block extra_css %}{% endblock %}
     <style>
         #mobile-menu {
@@ -97,18 +98,18 @@
                 Регистрация
             </a>
         {% else %}
-                <a href="{% url 'users:profile' %}"
-                   class="inline-block py-2 px-4 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition mr-3">
-                    Профиль
-                </a>
-                <form action="{% url 'users:logout' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <button type="submit"
-                            class="inline-block py-2 px-4 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
-                        Выйти
-                    </button>
-                </form>
-            {% endif %}
+            <a href="{% url 'users:profile' %}"
+               class="inline-block py-2 px-4 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition mr-3">
+                Профиль
+            </a>
+            <form action="{% url 'users:logout' %}" method="post" class="inline">
+                {% csrf_token %}
+                <button type="submit"
+                        class="inline-block py-2 px-4 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                    Выйти
+                </button>
+            </form>
+        {% endif %}
     </div>
 </nav>
 
