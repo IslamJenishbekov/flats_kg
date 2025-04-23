@@ -1,57 +1,196 @@
 {% extends 'base_generic.html' %}
 
+{% block extra_css %}
+    <style>
+        .valid-field {
+            border-color: #10b981 !important;
+            transition: border-color 0.3s ease-in-out;
+            box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+        }
+
+        .invalid-field {
+            border-color: #ef4444 !important;
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
+    <div class="flex flex-col flex-grow justify-center bg-gray-50 py-8">
+        <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
+            <h2 class="text-2xl font-semibold text-center mb-6">Регистрация нового пользователя</h2>
 
-  <div class="flex flex-col flex-grow justify-center bg-gray-50 py-8">
+            <form method="POST" id="register-form">
+                {% csrf_token %}
 
-    <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
-      <h2 class="text-2xl font-semibold text-center mb-6">Регистрация нового пользователя</h2>
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Имя пользователя:</label>
+                    <input type="text" id="username" name="username" placeholder="Введите имя пользователя"
+                           value="{{ form.username.value|default:'' }}" required
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                    {% if form.username.errors %}
+                        <div class="error-message">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-      <form method="POST">
-        {% csrf_token %}
+                <div class="mb-4">
+                    <label for="tg_link" class="block text-sm font-medium text-gray-700">Ссылка на Telegram:</label>
+                    <input type="text" id="tg_link" name="tg_link"
+                           placeholder="Введите ссылку на Telegram (например, https://t.me/username)"
+                           value="{{ form.tg_link.value|default:'' }}" required
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                    {% if form.tg_link.errors %}
+                        <div class="error-message">
+                            {% for error in form.tg_link.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-        <div class="mb-4">
-          <label for="username" class="block text-sm font-medium text-gray-700">Имя пользователя:</label>
-          <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required
-                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                <div class="mb-4">
+                    <label for="tel_number" class="block text-sm font-medium text-gray-700">Номер телефона:</label>
+                    <input type="text" id="tel_number" name="tel_number"
+                           placeholder="Введите номер телефона (например, +996123456789)"
+                           value="{{ form.tel_number.value|default:'' }}" required
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                    {% if form.tel_number.errors %}
+                        <div class="error-message">
+                            {% for error in form.tel_number.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="password1" class="block text-sm font-medium text-gray-700">Пароль:</label>
+                    <input type="password" id="password1" name="password1" placeholder="Введите пароль" required
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                    {% if form.password1.errors %}
+                        <div class="error-message">
+                            {% for error in form.password1.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <ul class="text-sm text-gray-600 mt-2 list-disc list-inside">
+                        <li>Минимум 8 символов</li>
+                        <li>Содержит хотя бы одну цифру</li>
+                        <li>Содержит хотя бы один знак пунктуации (например, !@#$%^&*)</li>
+                        <li>Не должен быть слишком простым (например, "password123")</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password2" class="block text-sm font-medium text-gray-700">Подтвердите пароль:</label>
+                    <input type="password" id="password2" name="password2" placeholder="Подтвердите пароль" required
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
+                    {% if form.password2.errors %}
+                        <div class="error-message">
+                            {% for error in form.password2.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="text-red-500 text-sm mb-4">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div>
+                    <button type="submit"
+                            class="w-full py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                        Зарегистрироваться
+                    </button>
+                </div>
+            </form>
+
+            <p class="mt-4 text-center text-sm text-gray-600">Уже есть аккаунт? <a href="{% url 'login' %}"
+                                                                                   class="text-yellow-400 hover:text-yellow-500">Войдите</a>
+            </p>
         </div>
-
-        <div class="mb-4">
-          <label for="tg_link" class="block text-sm font-medium text-gray-700">Ссылка на Telegram:</label>
-          <input type="text" id="tg_link" name="tg_link" placeholder="Введите ссылку на Telegram" required
-                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
-        </div>
-
-        <div class="mb-4">
-          <label for="tel_number" class="block text-sm font-medium text-gray-700">Номер телефона:</label>
-          <input type="text" id="tel_number" name="tel_number" placeholder="Введите номер телефона" required
-                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
-        </div>
-
-        <div class="mb-4">
-          <label for="password1" class="block text-sm font-medium text-gray-700">Пароль:</label>
-          <input type="password" id="password1" name="password1" placeholder="Введите пароль" required
-                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
-        </div>
-
-        <div class="mb-6">
-          <label for="password2" class="block text-sm font-medium text-gray-700">Подтвердите пароль:</label>
-          <input type="password" id="password2" name="password2" placeholder="Подтвердите пароль" required
-                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent">
-        </div>
-
-        <div class="text-red-500 text-sm mb-4">
-          {{ form.errors }}
-        </div>
-
-        <div>
-          <button type="submit" class="w-full py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
-            Зарегистрироваться
-          </button>
-        </div>
-      </form>
-
-      <p class="mt-4 text-center text-sm text-gray-600">Уже есть аккаунт? <a href="{% url 'login' %}" class="text-yellow-400 hover:text-yellow-500">Войдите</a></p>
     </div>
-  </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // Regular expressions for validation
+        const usernameRegex = /^[a-zA-Z0-9_]{3,}$/;
+        const telegramRegex = /^https:\/\/t\.me\/[a-zA-Z0-9_]+$/;
+        const phoneRegex = /^\+\d{10,15}$/;
+        const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]).{8,}$/;
+
+        // Get input fields
+        const usernameInput = document.getElementById('username');
+        const tgLinkInput = document.getElementById('tg_link');
+        const telNumberInput = document.getElementById('tel_number');
+        const password1Input = document.getElementById('password1');
+        const password2Input = document.getElementById('password2');
+
+        // Validation functions
+        function validateField(input, regex) {
+            if (regex.test(input.value)) {
+                input.classList.remove('invalid-field');
+                input.classList.add('valid-field');
+            } else {
+                input.classList.remove('valid-field');
+                input.classList.add('invalid-field');
+            }
+        }
+
+        function validatePasswordMatch() {
+            if (password1Input.value === password2Input.value && password1Input.value !== '') {
+                password2Input.classList.remove('invalid-field');
+                password2Input.classList.add('valid-field');
+            } else {
+                password2Input.classList.remove('valid-field');
+                password2Input.classList.add('invalid-field');
+            }
+        }
+
+        // Event listeners for real-time validation
+        usernameInput.addEventListener('input', () => validateField(usernameInput, usernameRegex));
+        tgLinkInput.addEventListener('input', () => validateField(tgLinkInput, telegramRegex));
+        telNumberInput.addEventListener('input', () => validateField(telNumberInput, phoneRegex));
+        password1Input.addEventListener('input', () => {
+            validateField(password1Input, passwordRegex);
+            validatePasswordMatch();
+        });
+        password2Input.addEventListener('input', validatePasswordMatch);
+
+        // Highlight fields with errors on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            {% if form.username.errors %}
+                usernameInput.classList.add('invalid-field');
+            {% endif %}
+            {% if form.tg_link.errors %}
+                tgLinkInput.classList.add('invalid-field');
+            {% endif %}
+            {% if form.tel_number.errors %}
+                telNumberInput.classList.add('invalid-field');
+            {% endif %}
+            {% if form.password1.errors %}
+                password1Input.classList.add('invalid-field');
+            {% endif %}
+            {% if form.password2.errors %}
+                password2Input.classList.add('invalid-field');
+            {% endif %}
+        });
+    </script>
 {% endblock %}

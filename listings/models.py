@@ -62,3 +62,9 @@ class Favorites(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='favorites')
 
 
+class FeatureOptions(models.Model):
+    feature_name = models.TextField()
+    option = models.TextField()
+
+    def __str__(self):
+        return f"{self.feature_name} {self.option}"

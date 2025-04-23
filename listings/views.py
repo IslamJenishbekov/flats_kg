@@ -89,10 +89,12 @@ def show_all_listings(request):
         for listing in page_obj  # Используем page_obj вместо listings
     ]
 
-    # Загружаем возможные значения фильтров из JSON
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
-    with open(json_path, 'r', encoding='utf-8') as file:
-        filter_values = json.load(file)
+    filter_values = dict()
+    for ob in FeatureOptions.objects.all():
+        if ob.feature_name in filter_values.keys():
+            filter_values[ob.feature_name].append(ob.option)
+        else:
+            filter_values[ob.feature_name] = [ob.option]
 
     # Передаем данные в шаблон
     return render(request, 'listings/all_listings.html', {
@@ -156,8 +158,12 @@ def create_listing(request):
 
         return redirect("users:profile")
 
-    with open(r'listings/possible_fields.json', 'r', encoding='utf-8') as file:
-        context = json.load(file)
+    context = dict()
+    for ob in FeatureOptions.objects.all():
+        if ob.feature_name in context.keys():
+            context[ob.feature_name].append(ob.option)
+        else:
+            context[ob.feature_name] = [ob.option]
     return render(request, 'listings/create_listing.html', context)
 
 
@@ -173,6 +179,7 @@ def show_my_listings(request):
     return render(request, 'listings/my_listings.html', {'listings_with_pictures': listings_with_pictures})
 
 
+@login_required
 def show_listing_detail(request, listing_id):
     if request.method == "POST" and request.user.role == 'moderator':
         listing_id = request.POST.get('listing_id')
@@ -369,10 +376,12 @@ def edit_listing(request, listing_id):
 
         return redirect('listing_detail', listing_id=listing.id)  # Перенаправление после сохранения
 
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'possible_fields.json')
-
-    with open(json_path, 'r', encoding='utf-8') as file:
-        context = json.load(file)
+    context = dict()
+    for ob in FeatureOptions.objects.all():
+        if ob.feature_name in context.keys():
+            context[ob.feature_name].append(ob.option)
+        else:
+            context[ob.feature_name] = [ob.option]
 
     context["pictures"] = listing.pictures.all()
     context["listing_detail"] = listing_detail

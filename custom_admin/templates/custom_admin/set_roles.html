@@ -1,0 +1,58 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Manage User Roles{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Manage User Roles</h1>
+
+    <!-- Search Form -->
+    <form method="get" class="mb-6">
+        <div class="flex flex-col space-y-4">
+            <label for="username" class="text-lg font-semibold text-gray-700">Enter Username</label>
+            <div class="flex space-x-2">
+                <input type="text" name="username" id="username" value="{{ username|default_if_none:'' }}"
+                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                       placeholder="Enter username to search" required>
+                <button type="submit"
+                        class="px-6 py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Error Message -->
+    {% if error_message %}
+        <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-md">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <!-- Update Role Form (shown if user is found) -->
+    {% if user_obj %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex flex-col space-y-4">
+                <label for="role" class="text-lg font-semibold text-gray-700">Role for {{ user_obj.username }}</label>
+                <select name="role" id="role"
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        required>
+                    <option value="client" {% if user_obj.role == 'client' %}selected{% endif %}>Client</option>
+                    <option value="support" {% if user_obj.role == 'support' %}selected{% endif %}>Support</option>
+                    <option value="moderator" {% if user_obj.role == 'moderator' %}selected{% endif %}>Moderator</option>
+                </select>
+                <button type="submit"
+                        class="px-6 py-2 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition">
+                    Update Role
+                </button>
+            </div>
+        </form>
+        {% if success_message %}
+            <div class="mt-6 p-4 bg-green-100 text-green-700 rounded-md">
+                {{ success_message }}
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

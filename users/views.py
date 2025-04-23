@@ -14,6 +14,8 @@ from users.forms import CustomUserCreationForm
 from users.models import *
 from listings.models import Listing
 
+from django.contrib.auth.models import User
+
 
 @login_required
 def profile_view(request):
@@ -26,17 +28,24 @@ def profile_view(request):
         request.user.avatar_base64 = img_base64
         request.user.save()
         return redirect('users:profile')  # Предполагается, что у вас есть name='profile' в urls.py
+    if request.user.is_superuser:
+        return redirect('custom_admin:admin_profile')
     return render(request, 'users/profile.html')
 
 
 class RegisterUser(CreateView):
     form_class = CustomUserCreationForm
-    template_name = "registration/register.html"
-    success_url = reverse_lazy("login")
+    template_name = 'registration/register.html'
+    success_url = reverse_lazy('login')
 
-    def form_invalid(self, form):
-        print(form.errors)
-        return super().form_invalid(form)
+    def form_valid(self, form):
+        # Save the user and any additional fields (e.g., tg_link, tel_number)
+        user = form.save()
+        # Save additional fields to a profile model if needed
+        # Example: user.profile.tg_link = form.cleaned_data['tg_link']
+        # user.profile.tel_number = form.cleaned_data['tel_number']
+        # user.profile.save()
+        return super().form_valid(form)
 
 
 def show_user_profile(request, user_id):

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'common',
     'support',
     'moderation',
+    'custom_admin',
 ]
 
 MIDDLEWARE = [

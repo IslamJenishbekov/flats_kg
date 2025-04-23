@@ -1,0 +1,106 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Управление фильтрами{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center">Управление фильтрами</h1>
+
+    <!-- Сообщения об успехе или ошибке -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="p-4 mb-2 text-white {% if message.tags == 'success' %}bg-green-500{% else %}bg-red-500{% endif %} rounded">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Форма для добавления фильтра -->
+    <div class="mb-8 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Добавить новый фильтр</h2>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="feature_name_select" class="block text-lg font-medium">Название фильтра</label>
+                <select name="feature_name_select" id="feature_name_select" class="w-full p-2 border rounded-md" required>
+                    <option value="" disabled selected>Выберите фильтр</option>
+                    {% for feature_name in filters.keys %}
+                    <option value="{{ feature_name }}">{{ feature_name }}</option>
+                    {% endfor %}
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+            <div id="new_feature_name_div" class="hidden">
+                <label for="new_feature_name" class="block text-lg font-medium">Новое название фильтра</label>
+                <input type="text" name="new_feature_name" id="new_feature_name" class="w-full p-2 border rounded-md">
+            </div>
+            <div>
+                <label for="option" class="block text-lg font-medium">Значение фильтра</label>
+                <input type="text" name="option" id="option" class="w-full p-2 border rounded-md" required>
+            </div>
+            <input type="hidden" name="action" value="add">
+            <button type="submit" class="py-2 px-4 bg-yellow-400 text-white font-semibold rounded-md hover:bg-yellow-500 transition">
+                Добавить
+            </button>
+        </form>
+    </div>
+
+    <!-- Список текущих фильтров -->
+    <div class="p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Текущие фильтры</h2>
+        {% if filters %}
+        {% for feature_name, options in filters.items %}
+        <div class="mb-6">
+            <h3 class="text-xl font-medium">{{ feature_name }}</h3>
+            <ul class="list-disc pl-6">
+                {% for option in options %}
+                <li class="flex items-center justify-between py-2">
+                    <span>{{ option }}</span>
+                    <form method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="feature_name" value="{{ feature_name }}">
+                        <input type="hidden" name="option" value="{{ option }}">
+                        <input type="hidden" name="action" value="delete">
+                        <button type="submit" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-gray-500">Фильтры отсутствуют.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('feature_name_select').addEventListener('change', function () {
+        var newFeatureNameDiv = document.getElementById('new_feature_name_div');
+        if (this.value === 'other') {
+            newFeatureNameDiv.classList.remove('hidden');
+            document.getElementById('new_feature_name').setAttribute('required', 'required');
+        } else {
+            newFeatureNameDiv.classList.add('hidden');
+            document.getElementById('new_feature_name').removeAttribute('required');
+        }
+    });
+
+    // Подтверждение удаления
+    document.querySelectorAll('form[action="{% url 'custom_admin:manage_filters' %}"]').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            if (form.querySelector('input[name="action"]').value === 'delete') {
+                if (!confirm('Вы уверены, что хотите удалить этот фильтр?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
