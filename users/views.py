@@ -4,9 +4,13 @@ from io import BytesIO
 
 from PIL import Image
 from django.contrib import messages
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic import CreateView
 
 from moderation.models import UserBlocking
@@ -84,3 +88,57 @@ def show_user_profile(request, user_id):
     if request.user == user:
         return redirect('users:profile')
     return render(request, 'users/another_profile.html', {'user': user})
+
+
+@login_required
+@require_POST
+def change_password(request):
+    try:
+        # Парсим JSON-данные из тела запроса
+        data = json.loads(request.body)
+        old_password = data.get('old_password')
+        new_password1 = data.get('new_password1')
+        new_password2 = data.get('new_password2')
+
+        # Проверка наличия всех полей
+        if not all([old_password, new_password1, new_password2]):
+            return JsonResponse({'error': 'Все поля обязательны для заполнения'}, status=400)
+
+        # Проверка совпадения новых паролей
+        if new_password1 != new_password2:
+            return JsonResponse({'error': 'Новые пароли не совпадают'}, status=400)
+
+        # Проверка длины нового пароля
+        if len(new_password1) < 8:
+            return JsonResponse({'error': 'Новый пароль должен содержать минимум 8 символов'}, status=400)
+
+        # Проверка, что новый пароль отличается от старого
+        if old_password == new_password1:
+            return JsonResponse({'error': 'Новый пароль не должен совпадать со старым'}, status=400)
+
+        # Проверка сложности пароля (хотя бы одна заглавная буква и одна цифра)
+        if not any(c.isupper() for c in new_password1):
+            return JsonResponse({'error': 'Пароль должен содержать хотя бы одну заглавную букву'}, status=400)
+        if not any(c.isdigit() for c in new_password1):
+            return JsonResponse({'error': 'Пароль должен содержать хотя бы одну цифру'}, status=400)
+
+        # Аутентификация пользователя со старым паролем
+        user = authenticate(username=request.user.username, password=old_password)
+        if user is None:
+            return JsonResponse({'error': 'Неверный старый пароль'}, status=400)
+
+        # Установка нового пароля
+        request.user.set_password(new_password1)
+        request.user.save()
+
+        return JsonResponse({'success': 'Пароль успешно изменен'}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Неверный формат данных'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Произошла ошибка: {str(e)}'}, status=500)
+
+
+@login_required
+def change_password_view(request):
+    return render(request, 'users/change_password.html')
