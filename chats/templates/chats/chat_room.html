@@ -67,91 +67,80 @@
     </div>
 
     <script>
-    const roomId = {{ chat_room.id }};
-    const currentUser = "{{ request.user.username }}";
-    let lastMessageId = {% if messages %}{{ messages.last.id }}{% else %}0{% endif %};
-    const csrfToken = "{{ csrf_token }}";
-    let isSending = false;
-
-    document.addEventListener('DOMContentLoaded', () => {
+        const roomId = {{ chat_room.id }};
+        const currentUser = "{{ request.user.username }}";
         const chatLog = document.getElementById('chat-log');
-        chatLog.scrollTop = chatLog.scrollHeight;
-
         const messageInput = document.getElementById('message-input');
         const sendButton = document.querySelector('button[onclick="sendMessage()"]');
+        let isSending = false;
 
-        sendButton.addEventListener('click', sendMessage);
+        // Инициализация WebSocket
+        const socket = new WebSocket(`ws://${window.location.host}/ws/chat/${roomId}/`);
 
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-    });
+        socket.onopen = function () {
+            console.log('WebSocket подключен');
+            // Прокрутка чата вниз при загрузке
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
 
-    async function getNewMessages() {
-        try {
-            const response = await fetch(`/chats/get_new_messages/${roomId}/?last_message_id=${lastMessageId}`);
-            const data = await response.json();
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            const msg = data.message;
 
-            if (data.messages?.length > 0) {
-                const chatLog = document.getElementById('chat-log');
-                data.messages.forEach(msg => {
-                    const isCurrentUser = msg.sender === currentUser;
-
-                    const messageHtml = `
-                    <div class="flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
-                        <div class="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl w-fit rounded-lg px-4 py-2 ${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} break-words">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="font-semibold">${msg.sender}</span>
-                                <span class="text-xs opacity-80 ml-2">${msg.timestamp}</span>
-                            </div>
-                            <p class="whitespace-pre-wrap">${msg.content}</p>
-                        </div>
+            const isCurrentUser = msg.sender === currentUser;
+            const messageHtml = `
+            <div class="flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl w-fit rounded-lg px-4 py-2 ${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} break-words">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-semibold">${msg.sender}</span>
+                        <span class="text-xs opacity-80 ml-2">${msg.timestamp}</span>
                     </div>
-                    `;
-                    chatLog.innerHTML += messageHtml;
-                    lastMessageId = msg.id;
-                });
-                chatLog.scrollTop = chatLog.scrollHeight;
-            }
-        } catch (error) {
-            console.error('Ошибка получения сообщений:', error);
-        }
-    }
+                    <p class="whitespace-pre-wrap">${msg.content}</p>
+                </div>
+            </div>
+        `;
+            chatLog.innerHTML += messageHtml;
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
 
-    async function sendMessage() {
-        if (isSending) return;
+        socket.onclose = function () {
+            console.error('WebSocket закрыт');
+        };
 
-        const messageInput = document.getElementById('message-input');
-        const message = messageInput.value.trim();
+        socket.onerror = function (error) {
+            console.error('Ошибка WebSocket:', error);
+        };
 
-        if (message === '') return;
+        async function sendMessage() {
+            if (isSending) return;
 
-        isSending = true;
+            const message = messageInput.value.trim();
+            if (message === '') return;
 
-        try {
-            const response = await fetch(`/chats/send_message/${roomId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({message})
-            });
+            isSending = true;
 
-            const data = await response.json();
-            if (data.success) {
+            try {
+                socket.send(JSON.stringify({
+                    'message': message
+                }));
                 messageInput.value = '';
+            } catch (error) {
+                console.error('Ошибка отправки сообщения:', error);
+            } finally {
+                isSending = false;
             }
-        } catch (error) {
-            console.error('Ошибка отправки сообщения:', error);
-        } finally {
-            isSending = false;
         }
-    }
 
-    setInterval(getNewMessages, 3000);
-</script>
+        // Обработчики событий
+        document.addEventListener('DOMContentLoaded', () => {
+            sendButton.addEventListener('click', sendMessage);
+
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+    </script>
 {% endblock %}
