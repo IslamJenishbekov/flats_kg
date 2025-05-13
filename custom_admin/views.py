@@ -4,8 +4,14 @@ from django.contrib import messages
 from users.models import User
 from listings.models import *
 
+from django.db.models import Count
+from django.db.models.functions import TruncDate
+from datetime import timedelta
+from django.utils import timezone
+
 
 def show_admin_profile(request):
+    # Существующие вычисления
     users_gen_num = User.objects.count()
     number_blocked_users = User.objects.filter(is_blocked=True).count()
     number_active_users = User.objects.filter(is_blocked=False).count()
@@ -15,8 +21,34 @@ def show_admin_profile(request):
     number_blocked_listings = Listing.objects.filter(is_blocked=True).count()
     number_active_listings = Listing.objects.filter(is_blocked=False).count()
 
-    new_listings = Listing.objects.values('created_at')
-    new_users = User.objects.values('created_at')
+    new_users_data = (
+        User.objects
+        .annotate(date=TruncDate('created_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+
+    new_listings_data = (
+        Listing.objects
+        .annotate(date=TruncDate('created_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=30)
+
+    dates = [(start_date + timedelta(days=x)).strftime('%Y-%m-%d') for x in range(31)]
+
+    users_counts = {str(item['date']): item['count'] for item in new_users_data}
+    listings_counts = {str(item['date']): item['count'] for item in new_listings_data}
+
+    new_users_chart_data = [users_counts.get(date, 0) for date in dates]
+    new_listings_chart_data = [listings_counts.get(date, 0) for date in dates]
+    print(new_users_chart_data)
+    print(new_listings_chart_data)
 
     context = {
         'users_gen_num': users_gen_num,
@@ -26,8 +58,9 @@ def show_admin_profile(request):
         'listings_gen_num': listings_gen_num,
         'number_blocked_listings': number_blocked_listings,
         'number_active_listings': number_active_listings,
-        'new_listings': new_listings,
-        'new_users': new_users,
+        'new_users_chart_data': new_users_chart_data,
+        'new_listings_chart_data': new_listings_chart_data,
+        'chart_dates': dates,
     }
     return render(request, 'custom_admin/admin_profile.html', context=context)
 
