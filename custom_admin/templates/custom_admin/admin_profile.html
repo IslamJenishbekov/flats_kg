@@ -6,37 +6,39 @@
             <a href="{% url 'custom_admin:manage_filters' %}"
                class="inline-flex items-center px-6 py-3 bg-yellow-400 from-yellow-400 to-yellow-500 text-white font-medium rounded-lg shadow-lg hover:from-amber-500 hover:to-amber-600 transition-all transform hover:-translate-y-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd"
+                          d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                          clip-rule="evenodd"/>
                 </svg>
                 Управление фильтрами
             </a>
-
             <a href="{% url 'custom_admin:set_roles' %}"
                class="inline-flex items-center px-6 py-3 bg-yellow-400 from-yellow-400 to-yellow-500 text-white font-medium rounded-lg shadow-lg hover:from-blue-500 hover:to-blue-600 transition-all transform hover:-translate-y-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 12.094A5.973 5.973 0 004 15v1H1v-1a3 3 0 013.75-2.906z" />
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 12.094A5.973 5.973 0 004 15v1H1v-1a3 3 0 013.75-2.906z"/>
                 </svg>
                 Назначение ролей
             </a>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow" data-aos="fade-up" data-aos-delay="100">
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow"
+                 data-aos="fade-up" data-aos-delay="100">
                 <div class="text-gray-500 font-medium">Всего пользователей</div>
                 <div class="text-3xl font-bold text-blue-600">{{ users_gen_num }}</div>
             </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow" data-aos="fade-up" data-aos-delay="200">
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow"
+                 data-aos="fade-up" data-aos-delay="200">
                 <div class="text-gray-500 font-medium">Активные пользователи</div>
                 <div class="text-3xl font-bold text-green-600">{{ number_active_users }}</div>
             </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-red-500 hover:shadow-lg transition-shadow" data-aos="fade-up" data-aos-delay="300">
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-red-500 hover:shadow-lg transition-shadow"
+                 data-aos="fade-up" data-aos-delay="300">
                 <div class="text-gray-500 font-medium">Заблокированные</div>
                 <div class="text-3xl font-bold text-red-600">{{ number_blocked_users }}</div>
             </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow" data-aos="fade-up" data-aos-delay="400">
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow"
+                 data-aos="fade-up" data-aos-delay="400">
                 <div class="text-gray-500 font-medium">Продавцы</div>
                 <div class="text-3xl font-bold text-purple-600">{{ seller_count }}</div>
             </div>
@@ -52,7 +54,6 @@
                     <canvas id="usersChart"></canvas>
                 </div>
             </div>
-
             <div class="bg-white p-6 rounded-xl shadow-lg" data-aos="fade-left">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-gray-800">Статистика объявлений</h2>
@@ -60,6 +61,16 @@
                 </div>
                 <div class="h-80">
                     <canvas id="listingsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg" data-aos="fade-right">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Новые пользователи</h2>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">Обновлено</span>
+                </div>
+                <div class="h-80">
+                    <canvas id="newUsersChart"></canvas>
                 </div>
             </div>
         </div>
@@ -84,6 +95,10 @@
             blocked: {{ number_blocked_listings }},
             active: {{ number_active_listings }}
         };
+
+        const newUsersData = {{ new_users_chart_data|safe }};
+        const newListingsData = {{ new_listings_chart_data|safe }};
+        const chartDates = {{ chart_dates|safe }};
 
         const usersCtx = document.getElementById('usersChart').getContext('2d');
         new Chart(usersCtx, {
@@ -221,5 +236,149 @@
                 }
             }
         });
+
+
+        console.log("Chart Dates:", chartDates);
+        console.log("New Users Data:", newUsersData);
+        console.log("New Listings Data:", newListingsData);
+
+        const newUsersCtx = document.getElementById('newUsersChart').getContext('2d');
+        if (newUsersCtx) {
+            new Chart(newUsersCtx, {
+                type: 'line',
+                data: {
+                    labels: chartDates,
+                    datasets: [{
+                        label: 'Новые пользователи',
+                        data: newUsersData,
+                        fill: false,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: {size: 16},
+                            bodyFont: {size: 14},
+                            padding: 12,
+                            cornerRadius: 6
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: Math.max(...newUsersData) + 10,
+                            grid: {color: 'rgba(0, 0, 0, 0.05)'},
+                            ticks: {stepSize: 1},
+                            title: {
+                                display: true,
+                                text: 'Количество',
+                                font: {size: 14}
+                            }
+                        },
+                        x: {
+                            grid: {display: false},
+                            title: {
+                                display: true,
+                                text: 'Дата',
+                                font: {size: 14}
+                            },
+                            ticks: {maxTicksLimit: 10}
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error("Canvas element 'newUsersChart' not found");
+        }
+
+        const newListingsCtx = document.getElementById('newListingsChart').getContext('2d');
+        if (newListingsCtx) {
+            new Chart(newListingsCtx, {
+                type: 'line',
+                data: {
+                    labels: chartDates,
+                    datasets: [{
+                        label: 'Новые объявления',
+                        data: newListingsData,
+                        fill: false,
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {size: 14}
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: {size: 16},
+                            bodyFont: {size: 14},
+                            padding: 12,
+                            cornerRadius: 6
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: Math.max(...newListingsData) + 10,
+                            grid: {color: 'rgba(0, 0, 0, 0.05)'},
+                            ticks: {stepSize: 1},
+                            title: {
+                                display: true,
+                                text: 'Количество',
+                                font: {size: 14}
+                            }
+                        },
+                        x: {
+                            grid: {display: false},
+                            title: {
+                                display: true,
+                                text: 'Дата',
+                                font: {size: 14}
+                            },
+                            ticks: {maxTicksLimit: 10}
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error("Canvas element 'newListingsChart' not found");
+        }
+        ;
     </script>
 {% endblock %}
